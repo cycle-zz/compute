@@ -198,22 +198,21 @@ typedef double             	ce_double4[4]   	CE_ALIGN_ATTRIBUTE(32);
 typedef double             	ce_double8[8]   	CE_ALIGN_ATTRIBUTE(64);
 typedef double             	ce_double16[16] 	CE_ALIGN_ATTRIBUTE(128);
 
-/* Boolean values *************************************************************/
+/* Boolean Values *************************************************************/
 
 #define CE_TRUE				(1)
 #define CE_FALSE			(0)
 
-/* Helper macros **************************************************************/
+/* Helper Macros **************************************************************/
 
 #define CE_CONCAT(a,b)		a##b
 #define CE_MAKE_NAME(a,b)	CE_CONCAT(a,b)
 
-/* Standard Headers ***********************************************************/
+/* OS Dependent Headers *******************************************************/
 
 #if defined(CE_PLATFORM_WINDOWS)
 	#include <windows.h>
 	#include <CL/cl.h>
-	#include <CL/cl_ext.h>
 #else
     #include <sys/stat.h>
     #include <sys/types.h>
@@ -224,19 +223,19 @@ typedef double             	ce_double16[16] 	CE_ALIGN_ATTRIBUTE(128);
 
 	#if defined(CE_PLATFORM_MACOSX)
 		#include <OpenCL/opencl.h>
+	#else
+		#include <CL/cl.h>
 	#endif
 #endif
 
+/* Standard Headers ***********************************************************/
+
+#include <stdio.h>
 #include <stddef.h>
 #include <limits.h>
 #include <float.h>
 #include <math.h>
 #include <ctype.h>
-#include <stdio.h>
-#include <math.h>
-
-/* OS dependent includes */
-
 
 /******************************************************************************/
 

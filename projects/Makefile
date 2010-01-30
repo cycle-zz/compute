@@ -1,13 +1,24 @@
-BASE_DIR	= .
-SRC_DIR 	= ./src
-INCLUDE 	= -I. -I./include
+BASE_DIR	= ..
+SRC_DIR 	= ../source
+INCLUDE 	= -I. -I$(BASE_DIR) -I$(BASE_DIR)/include
 
 LIBRARY_NAME:= wcl
 OS_NAME 	:= $(shell uname -s)
 
 ifeq ($(TARGET),)
-	TARGET		:= release
-	OPT_FLAGS	:= -O3
+	TARGET		= Release
+endif
+
+ifeq ($(TARGET),Release)
+	TARGET		= Release
+	OPT_FLAGS	= -O3
+	DEFINES		:= -DCE_RELEASE_BUILD
+endif
+
+ifeq ($(TARGET),Debug)
+	TARGET		:= Debug
+	DBG_FLAGS	:= -gstabs+ -feliminate-unused-debug-symbols
+	DEFINES		:= -DDEBUG -DCE_DEBUG_BUILD
 endif
 
 ifeq ($(LIB_CONFIG),)
@@ -37,7 +48,7 @@ STATIC_LIB	:= $(TARGET_DIR)/lib$(LIBRARY_NAME).$(STATIC_EXT)
 SHARED_LIB	:= $(TARGET_DIR)/lib$(LIBRARY_NAME).$(SHARED_EXT)
 SRC_FILES	:= $(shell ls $(SRC_DIR)/*.c)
 OBJ_FILES	:= $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
-HDR_FILES	:= $(shell ls ./include/*.h $(SRC_DIR)/*.h)
+HDR_FILES	:= $(shell ls $(BASE_DIR)/include/*.h $(SRC_DIR)/*.h)
 LIBPATH 	+= -L$(TARGET_DIR)
 
 LD = libtool
@@ -58,23 +69,35 @@ endif
 
 default: $(LIB_FILE)
 
+Release:
+	$(MAKE) $(MAKEFILE) TARGET=Release
+
+release:
+	$(MAKE) $(MAKEFILE) TARGET=Release
+
+Debug:
+	$(MAKE) $(MAKEFILE) TARGET=Debug 
+
+debug:
+	$(MAKE) $(MAKEFILE) TARGET=Debug 
+
 shared:
  	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared
 
 shared-debug:
-	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared DBG_FLAGS=" -DDEBUG " TARGET=debug 
+	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared TARGET=Debug 
 
-shared-release:
-	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared OPT_FLAGS=" -O3 " TARGET=release
+shared-Release:
+	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared TARGET=Release
 
 static:
  	$(MAKE) $(MAKEFILE) LIB_CONFIG=static
 
 static-debug:
-	$(MAKE) $(MAKEFILE) LIB_CONFIG=static DBG_FLAGS=" -DDEBUG " TARGET=debug 
+	$(MAKE) $(MAKEFILE) LIB_CONFIG=static TARGET=Debug 
 
-static-release:
-	$(MAKE) $(MAKEFILE) LIB_CONFIG=static OPT_FLAGS=" -O3 " TARGET=release
+static-Release:
+	$(MAKE) $(MAKEFILE) LIB_CONFIG=static TARGET=Release
 
 $(LIB_FILE): $(BUILD_DIR) $(LIB_DIR) $(TARGET_DIR) $(OBJ_DIR)
 
