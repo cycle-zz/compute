@@ -63,6 +63,9 @@ typedef struct _ce_session_t {
 /**************************************************************************************************/
 
 extern CE_API_EXPORT ce_session
+ceCreateSessionForHost(void);
+
+extern CE_API_EXPORT ce_session
 ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count);
 
 extern CE_API_EXPORT cl_bool

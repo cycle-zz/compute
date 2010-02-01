@@ -32,36 +32,73 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_SYMBOL_H__
-#define __CE_SYMBOL_H__
+#include "stack.h"
+#include "atomics.h"
 
 /**************************************************************************************************/
 
-#include "compute.h"
- 
-/**************************************************************************************************/
+typedef struct _ce_stack_node_t {
+  struct _ce_stack_node_t*		next; 
+  ce_reference	 				item;
+  ce_reference	 				reference;
+} ce_stack_node_t;
 
-CE_EXTERN_C_BEGIN
-
-/**************************************************************************************************/
-
-extern CE_API_EXPORT ce_symbol
-ceCreateSymbol(ce_session session, const char* name, size_t length);
-
-extern CE_API_EXPORT void 
-ceReleaseSymbol(ce_symbol symbol);
-
-extern CE_API_EXPORT const char*
-ceGetSymbolName(ce_symbol symbol);
-
-extern CE_API_EXPORT ce_uint
-ceGetSymbolHash(ce_symbol symbol);
-
-extern CE_API_EXPORT size_t
-ceGetSymbolLength(ce_symbol symbol);
+typedef struct _ce_stack_t {
+	ce_stack_node_t*	head;
+	ce_session			session;
+} ce_stack_t;
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
+ce_stack_node_t* ceCreateStackNode(
+	ce_session session,
+	ce_reference item)
+{
+	ce_stack_node_t* node = ceAllocate(session, sizeof(ce_stack_node_t));
+	memset(node, 0, sizeof(ce_stack_node_t));
+	node->reference = ceCreateReference(session, node);
+	node->item = item;
+	return node;
+}
 
-#endif /* __CE_SYMBOL_H__ */
+ce_stack ceCreateStack(
+	ce_session session)
+{
+	ce_stack_t* stack = ceAllocate(session, sizeof(ce_stack_t));
+	memset(stack, 0, sizeof(ce_stack_t));
+	
+	stack->session = session;
+	stack->head = ceCreateStackNode(session, NULL);
+	return (ce_stack)stack;
+}
+
+void cePushStack(
+	ce_stack opaque,
+	ce_reference item)
+{
+	ce_stack_t* stack = (ce_stack_t*)(opaque);
+	ce_stack_node_t* node = ceCreateStackNode((ce_session)stack->session, item);
+	do {
+		node = stack->head->next;
+	}
+	while( !ceAtomicCompareAndSwapPtr((void**)&(stack->head->next), node->next, node) ); 
+}
+
+ce_reference cePopStack(
+	ce_stack opaque)
+{
+	ce_stack_t* stack = (ce_stack_t*)(opaque);
+	ce_stack_node_t* node = NULL;
+	ce_reference item = NULL;
+	
+	do {
+		node = stack->head->next;
+		if(node == NULL) 
+			return item;
+	} 
+	while( !ceAtomicCompareAndSwapPtr((void**)&(stack->head->next), node, node->next) ); 
+	
+	item = node->item;
+	ceRelease(stack->session, node->reference);	
+	return item;
+}

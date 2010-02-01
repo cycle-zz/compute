@@ -2,7 +2,7 @@
 
 Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmanext <derek.gerstmanext[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -39,18 +39,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 typedef unsigned short ce_map_index_t;
 
-typedef struct _ce_map_entry_t {
-    struct _ce_map_entry_t* 	next; 
+typedef struct _ce_map_node_t {
+    struct _ce_map_node_t* 	next; 
     ce_symbol 					key;
-    void*						data;
-   	size_t						size;
-    ce_type_t					type;
-} ce_map_entry_t;
+    ce_reference				item;
+} ce_map_node_t;
 
 typedef struct _ce_map_t {
 	ce_session					session;
-	ce_map_entry_t** 			bins;
-	ce_map_index_t 			size;
+	ce_map_node_t** 			bins;
+	ce_map_index_t 				size;
 } ce_map_t;
 
 /**************************************************************************************************/
@@ -69,7 +67,7 @@ ceCreateMap(
 	map = ceAllocate(session, sizeof(ce_map_t));
 	map->size = 0;
 	
-	bytes = size * sizeof(ce_map_entry_t *);
+	bytes = size * sizeof(ce_map_node_t *);
 	map->bins = ceAllocate(session, bytes);
 	if(!map->bins)
 		return 0;
@@ -82,121 +80,117 @@ ceCreateMap(
 
 void
 ceReleaseMap(
-	ce_map map)
+	ce_map opaque)
 {
-    ce_map_entry_t *n = 0;
-    ce_map_entry_t *nn = 0;
+    ce_map_node_t *node = NULL;
+    ce_map_node_t *next = NULL;
     ce_map_index_t index = 0;
 
-	ce_map_t* m = (ce_map_t*)map;
-	ce_session s = m->session;
+	ce_map_t* map = (ce_map_t*)opaque;
+	ce_session session = map->session;
 	
-	while(index < m->size)
+	while(index < map->size)
 	{
-		n = m->bins[index++];
-		while(n)
+		node = map->bins[index++];
+		while(node)
 		{
-			nn = n;
-			if(nn)
-				ceDeallocate(s, nn);
-			n = n->next;
+			next = node;
+			if(next)
+				ceDeallocate(session, next);
+			node = node->next;
 		}
     }
 	
-	ceDeallocate(s, m->bins);
-	ceDeallocate(s, m);
-    memset(map, 0, sizeof(ce_map_t));
+	ceDeallocate(session, map->bins);
+	ceDeallocate(session, map);
 }
 
 cl_int
 ceMapInsert(
-	ce_map map, ce_symbol key, ce_type_t type, size_t size, void* data)
+	ce_map opaque, 
+	ce_symbol key, 
+	ce_reference item)
 {
-    ce_map_entry_t *n = 0;
-    ce_map_entry_t *nn = 0;
+    ce_map_node_t *node = NULL;
+    ce_map_node_t *next = NULL;
     ce_map_index_t index = 0;
 
-	ce_map_t* m = (ce_map_t*)map;
-	ce_symbol_t* sym = (ce_symbol_t*)key;
-    if(sym == 0) 
+	ce_map_t* map = (ce_map_t*)opaque;
+	
+	index = ceGetSymbolHash(key) % map->size;
+
+    if ((node = ceAllocate(map->session, sizeof(ce_map_node_t))) == 0) 
     	return 0;
 
-    index = sym->hash % m->size;
+    ceRetain(map->session, item);
 
-    if ((n = ceAllocate(m->session, sizeof(ce_map_entry_t))) == 0) 
-    	return 0;
+    next = map->bins[index];
+    map->bins[index] = node;
+    node->next = next;
+    node->key = key;
+    node->item = item;
 
-    nn = m->bins[index];
-    m->bins[index] = n;
-
-    n->next = nn;
-    n->key = key;
-    n->type = type;
-    n->data = data;
-    n->size = size;
     return CL_SUCCESS;
 }
 
-int 
+ce_reference 
 ceMapRemove(
-	ce_map map, ce_symbol key)
+	ce_map opaque, 
+	ce_symbol key)
 {
-    ce_map_entry_t *n = 0;
-    ce_map_entry_t *nn = 0;
+    ce_map_node_t *node = NULL;
+    ce_map_node_t *next = NULL;
     ce_map_index_t index = 0;
+    ce_reference item = NULL;
 
-	ce_map_t* m = (ce_map_t*)map;
-	ce_symbol_t* sym = (ce_symbol_t*)key;
-    if(sym == 0) 
-    	return 0;
+	ce_map_t* map = (ce_map_t*)opaque;
+	
+    index = ceGetSymbolHash(key) % map->size;
+    node = map->bins[index];
 
-    index = sym->hash % m->size;
-    n = m->bins[index];
-
-    while (n && !ceMapCompare(n->key, key)) {
-        nn = n;
-        n = n->next;
+    while (node && !ceMapCompare(node->key, key)) {
+        next = node;
+        node = node->next;
     }
 
-    if (!n) 
-    	return -1;
+    if (!node) 
+    	return NULL;
 
-    if (nn)
-        nn->next = n->next;
+    if (next)
+        next->next = node->next;
 
     else
-        m->bins[index] = n->next;
+        map->bins[index] = node->next;
 
-	ceReleaseSymbol(n->key);
-    ceDeallocate(m->session, n);
-    return 1;
+	item = node->item;
+	ceRelease(map->session, node->item);
+	ceReleaseSymbol(node->key);
+    ceDeallocate(map->session, node);
+    return item;
 }
 
-cl_int
-ceGetMapEntry(
-	ce_map map, ce_symbol key, ce_type_t type, size_t size, void* value, size_t *returned_size)
+ce_reference
+ceGetMapItem(
+	ce_map opaque, 
+	ce_symbol key)
 {
-    ce_map_entry_t *n = 0;
+    ce_map_node_t *node = NULL;
     ce_map_index_t index = 0;
 
-	ce_map_t* m = (ce_map_t*)map;
-	ce_symbol_t* sym = (ce_symbol_t*)key;
+	ce_map_t* map = (ce_map_t*)opaque;
 
-    index = sym->hash % m->size;
-    n = m->bins[index];
+	index = ceGetSymbolHash(key) % map->size;
+    node = map->bins[index];
 
-    while (n && !ceMapCompare(n->key, key)) 
+    while (node && !ceMapCompare(node->key, key)) 
     {
-		if(n && n->type == type && n->size == size && n->data)
+		if(node && node->item)
 		{
-			char* ptr = (char*)value;
-			memcpy(ptr, (char*)n->data, size);
-			(*returned_size) = n->size;
-			return CL_SUCCESS;
+			return node->item;
 		}
-    	n = n->next;
+    	node = node->next;
 	}
 
- 	return CL_INVALID_VALUE;
+ 	return NULL;
 }
 

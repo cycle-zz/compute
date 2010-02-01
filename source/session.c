@@ -36,12 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-static 
-ce_session_t* ceAllocateSession(void)
+static ce_session
+ceCreateSession(void)
 {
 	ce_session_t* session = ceAllocate(NULL, sizeof(ce_session_t));
 	memset(session, 0, sizeof(ce_session_t));
-	return session;
+	return (ce_session)session;
 }
 
 static void 
@@ -97,6 +97,12 @@ ceIsValidDeviceIndexForSession(ce_session session, cl_uint device_index)
 }
 
 ce_session
+ceCreateSessionForHost(void)
+{
+	return ceCreateSession();
+}
+
+ce_session
 ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count)
 {
     cl_int status = 0;
@@ -132,7 +138,7 @@ ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count)
 		return NULL;
 	}
 
-	session = ceAllocateSession();
+	session = (ce_session_t*)ceCreateSession();
 	session->context = clCreateContext(NULL, device_count, device_list, ceNotifyCallback, session, &status);
     if (!session->context)
     {
@@ -201,10 +207,15 @@ ceReleaseSession(ce_session session)
         for(i = 0; i < s->units; i++)
             clFinish(s->queues[i]);
     }
+
+	if(s->mem) 
+		ceReleaseMap(s->mem);
+
+	if(s->kernels)
+	    ceReleaseMap(s->kernels);
     
-    ceReleaseMap(s->mem);
-    ceReleaseMap(s->kernels);
-    ceReleaseMap(s->programs);
+    if(s->programs)
+	    ceReleaseMap(s->programs);
 
     if(s->queues)
     {
@@ -231,4 +242,3 @@ ceReleaseSession(ce_session session)
     ceDeallocate(NULL, s);
     return;
 }
-

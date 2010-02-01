@@ -39,6 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
+CE_EXTERN_C_BEGIN
+
+/**************************************************************************************************/
+
 #define CE_DEFAULT_MAP_SIZE 	(256)
 
 /**************************************************************************************************/
@@ -50,13 +54,17 @@ extern CE_API_EXPORT void
 ceReleaseMap(ce_map map);
 
 extern CE_API_EXPORT cl_int
-ceMapInsert(ce_map map, ce_symbol key, ce_type_t type, size_t size, void* data);
+ceMapInsert(ce_map map, ce_symbol key, ce_reference item);
 
-extern CE_API_EXPORT cl_int 
+extern CE_API_EXPORT ce_reference 
 ceMapRemove(ce_map map, ce_symbol key);
 
-extern CE_API_EXPORT cl_int
-ceGetMapEntry(ce_map map, ce_symbol key, ce_type_t type, size_t value_size, void* value, size_t* returned_size);
+extern CE_API_EXPORT ce_reference
+ceGetMapItem(ce_map map, ce_symbol key);
+
+/**************************************************************************************************/
+
+CE_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 

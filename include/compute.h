@@ -45,11 +45,16 @@ CE_EXTERN_C_BEGIN
 
 typedef enum _ce_type_t {
 	CE_TYPE_INVALID,
+	CE_TYPE_REFERENCE,
 	CE_TYPE_DEVICE,
 	CE_TYPE_QUEUE,
 	CE_TYPE_MEM,
 	CE_TYPE_PROGRAM,
 	CE_TYPE_KERNEL,
+	CE_TYPE_LOG,
+	CE_TYPE_MAP,
+	CE_TYPE_STACK,
+	CE_TYPE_SYMBOL,
 	CE_TYPE_MEMORY_INFO,
 	CE_TYPE_LOGGING_INFO,
 	CE_TYPE_PROFILING_INFO,
@@ -59,8 +64,10 @@ typedef enum _ce_type_t {
 /**************************************************************************************************/
 
 typedef struct _ce_session *    			ce_session;
+typedef struct _ce_reference*	 			ce_reference;
 typedef struct _ce_log* 		 			ce_log;
 typedef struct _ce_map* 		 			ce_map;
+typedef struct _ce_stack* 		 			ce_stack;
 typedef struct _ce_symbol* 	 				ce_symbol;
 typedef struct _ce_session_memory_info* 	ce_session_memory_info;
 typedef struct _ce_memory_info*  		 	ce_memory_info;

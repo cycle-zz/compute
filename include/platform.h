@@ -45,6 +45,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	#define CE_PLATFORM_LINUX	(1)
 #endif
 
+#if !(defined(__i386__) || defined(__amd64__))
+	#define CE_ARCH_PPC		(1)
+#endif
+
+#if (defined(__i386__) || defined(__amd64__))
+	#define CE_ARCH_X86		(1)
+#endif
+
 /* C Declaration **********************************************************************************/
 
 #if !defined(CE_EXTERN_C_BEGIN)
@@ -71,7 +79,7 @@ CE_EXTERN_C_BEGIN
 
 /* Export Declaration *****************************************************************************/
 
-#if defined(__WIN32__)
+#if defined(CE_PLATFORM_WINDOWS)
 	#if defined(CE_SHARED_LIB_TARGET) && defined(CE_SHARED_LIB_EXPORT)
 		#define CE_API_EXPORT 				__declspec(dllexport) 
 	#elif defined(CE_SHARED_LIB_TARGET)

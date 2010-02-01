@@ -32,36 +32,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_SYMBOL_H__
-#define __CE_SYMBOL_H__
+#ifndef __CE_STACK_H__
+#define __CE_STACK_H__
 
 /**************************************************************************************************/
 
 #include "compute.h"
- 
+
 /**************************************************************************************************/
 
 CE_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-extern CE_API_EXPORT ce_symbol
-ceCreateSymbol(ce_session session, const char* name, size_t length);
+extern CE_API_EXPORT ce_stack 
+ceCreateStack(ce_session session);
 
 extern CE_API_EXPORT void 
-ceReleaseSymbol(ce_symbol symbol);
+ceReleaseStack(ce_stack stack);
 
-extern CE_API_EXPORT const char*
-ceGetSymbolName(ce_symbol symbol);
+extern CE_API_EXPORT void
+cePushStack(ce_stack stack, ce_reference item);
 
-extern CE_API_EXPORT ce_uint
-ceGetSymbolHash(ce_symbol symbol);
-
-extern CE_API_EXPORT size_t
-ceGetSymbolLength(ce_symbol symbol);
+extern CE_API_EXPORT ce_reference
+cePopStack(ce_stack stack);
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
+CE_EXTERN_C_BEGIN
 
-#endif /* __CE_SYMBOL_H__ */
+/**************************************************************************************************/
+
+#endif /* __CE_STACK_H__ */

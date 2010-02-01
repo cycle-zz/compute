@@ -1,17 +1,67 @@
-BASE_DIR	= ..
-SRC_DIR 	= ../source
-INCLUDE 	= -I. -I$(BASE_DIR) -I$(BASE_DIR)/include
+# Project ##########################################################################################
 
-LIBRARY_NAME:= wcl
-OS_NAME 	:= $(shell uname -s)
+PROJECT_NAME	:= ce
+BASE_DIR		:= ..
+SRC_DIR 		:= ../source
+TST_DIR 		:= ../tests
+INCLUDE 		:= -I. -I$(BASE_DIR) -I$(BASE_DIR)/include
+USE_PTHREADS	:= 1
+
+# Tools ############################################################################################
+
+LD 				:= libtool
+CC 				:= gcc
+RM				:= rm
+MKDIR			:= mkdir
+
+# Platform #########################################################################################
+
+OS_NAME 		:= $(shell uname -s)
+
+ifeq ($(OS_NAME),Darwin)
+	DEFINES		+= -DDARWIN -D__APPLE__ -D__apple__
+	INCLUDE		+= -I/System/Library/Frameworks/OpenCL.framework/Headers
+	LIBRARIES 	+= -framework OpenCL -framework AppKit -framework Foundation
+	STATIC_EXT	:= a
+	SHARED_EXT	:= dylib
+endif
+
+ifeq ($(OS_NAME),Linux)
+	DEFINES		+= -DLINUX -D__LINUX__ -D__linux__
+	INCLUDE		+= -I/usr/local/include
+	LIBRARIES 	+= -libcl
+	STATIC_EXT	:= a
+	SHARED_EXT	:= so
+endif
+
+ifeq ($(USE_PTHREADS),1)
+	LIBRARIES	+= -lpthread
+	DEFINES		:= -DCE_USE_PTHREADS
+endif
+
+ifeq ($(ARCH),)
+	ARCH		:= $(shell uname -m)
+endif
+
+ifeq ($(ARCH),i386)
+	DEFINES 	+= -DCE_32BIT
+	ARCH_FLAGS	:= -m32 -msse2 -mfpmath=sse
+endif
+
+ifeq ($(ARCH),x86_64)
+	DEFINES 	+= -DCE_64BIT
+	ARCH_FLAGS	:= -m64
+endif
+
+# Target Settings ##################################################################################
 
 ifeq ($(TARGET),)
-	TARGET		= Release
+	TARGET		:= Release
 endif
 
 ifeq ($(TARGET),Release)
-	TARGET		= Release
-	OPT_FLAGS	= -O3
+	TARGET		:= Release
+	OPT_FLAGS	:= -O3
 	DEFINES		:= -DCE_RELEASE_BUILD
 endif
 
@@ -25,47 +75,40 @@ ifeq ($(LIB_CONFIG),)
 	LIB_CONFIG	:= static
 endif
 
-ifeq ($(OS_NAME),Darwin)
-	DEFINES		+= -DDARWIN -D__APPLE__ -D__apple__
-	INCLUDE		+= -I/System/Library/Frameworks/OpenCL.framework/Headers
-	LIBRARIES 	+= -framework OpenCL -framework AppKit -framework Foundation 
-	STATIC_EXT	:= a
-	SHARED_EXT	:= dylib
-endif
-ifeq ($OS_NAME),Linux)
-	DEFINES		+= -DLINUX -D__LINUX__ -D__linux__
-	INCLUDE		+= -I/usr/local/include
-	LIBRARIES 	+= -libcl
-	STATIC_EXT	:= a
-	SHARED_EXT	:= so
-endif
+# Build Configuration ##############################################################################
 
-BUILD_DIR	:= $(BASE_DIR)/build/$(OS_NAME)
-LIB_DIR		:= $(BASE_DIR)/lib/$(OS_NAME)
-OBJ_DIR 	:= $(BUILD_DIR)/$(TARGET)
-TARGET_DIR 	:= $(LIB_DIR)/$(TARGET)
-STATIC_LIB	:= $(TARGET_DIR)/lib$(LIBRARY_NAME).$(STATIC_EXT)
-SHARED_LIB	:= $(TARGET_DIR)/lib$(LIBRARY_NAME).$(SHARED_EXT)
-SRC_FILES	:= $(shell ls $(SRC_DIR)/*.c)
-OBJ_FILES	:= $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
-HDR_FILES	:= $(shell ls $(BASE_DIR)/include/*.h $(SRC_DIR)/*.h)
-LIBPATH 	+= -L$(TARGET_DIR)
+TEST_BIN_DIR 	:= $(BASE_DIR)/bin/$(OS_NAME)/$(ARCH)/$(TARGET)
+TARGET_DIR		:= $(BASE_DIR)/lib/$(OS_NAME)/$(ARCH)/$(TARGET)
+BUILD_DIR 		:= $(BASE_DIR)/build/$(OS_NAME)/$(ARCH)/$(TARGET)
+STATIC_LIB		:= $(TARGET_DIR)/lib$(PROJECT_NAME).$(STATIC_EXT)
+SHARED_LIB		:= $(TARGET_DIR)/lib$(PROJECT_NAME).$(SHARED_EXT)
+SRC_FILES		:= $(shell ls $(SRC_DIR)/*.c)
+OBJ_FILES		:= $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
+HDR_FILES		:= $(shell ls $(BASE_DIR)/include/*.h)
+TST_BUILD_DIR 	:= $(BASE_DIR)/build/$(OS_NAME)/$(ARCH)/Tests
+TST_DIR_LIST	:= $(shell ls -d $(TST_DIR)/*)
+TST_SRC_FILES	:= $(shell ls $(TST_DIR)/*/*.c)
+TST_OBJ_FILES	:= $(patsubst %.c,%.o,$(TST_SRC_FILES))
+TEST_NAMES		:= $(notdir $(wildcard $(TST_DIR)/*))
+TEST_BINS		:= $(addprefix bin/, $(TEST_NAMES))
+LIBPATH 		+= -L$(TARGET_DIR)
 
-LD = libtool
-CC = gcc
-
-
-BUILD_OPTIONS = -c -Wall -std=c99
-CFLAGS = $(BUILD_OPTIONS) $(DEFINES) $(OPT_FLAGS) $(DBG_FLAGS) $(INCLUDE) 
-LDFLAGS = -static
-
-ifeq ($(LIB_CONFIG),shared)
-	LIB_FILE	:= $(SHARED_LIB)
-	DEFINES		+= -DCE_SHARED_LIB_TARGET -DCE_SHARED_LIB_EXPORT
-else
+ifeq ($(LIB_CONFIG),static)
 	LIB_FILE	:= $(STATIC_LIB)
 	DEFINES		+= -DCE_STATIC_LIB_TARGET
+else
+	LIB_FILE	:= $(SHARED_LIB)	
+	DEFINES		+= -DCE_SHARED_LIB_TARGET -DCE_SHARED_LIB_EXPORT 
+	ifeq ($(OS_NAME),Darwin)
+		LDFLAGS		+= -flat_namespace -undefined suppress -bundle -noprebind
+	endif
 endif
+
+BUILD_OPTIONS 	:= -c -Wall -std=c99
+CFLAGS 			:= $(BUILD_OPTIONS) $(DEFINES) $(ARCH_FLAGS) $(OPT_FLAGS) $(DBG_FLAGS) $(INCLUDE) 
+
+
+# Rules ############################################################################################
 
 default: $(LIB_FILE)
 
@@ -81,46 +124,58 @@ Debug:
 debug:
 	$(MAKE) $(MAKEFILE) TARGET=Debug 
 
-shared:
- 	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared
+shared: $(SHARED_LIB)
 
 shared-debug:
 	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared TARGET=Debug 
 
-shared-Release:
+shared-release:
 	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared TARGET=Release
 
-static:
- 	$(MAKE) $(MAKEFILE) LIB_CONFIG=static
+static: $(STATIC_LIB)
 
 static-debug:
 	$(MAKE) $(MAKEFILE) LIB_CONFIG=static TARGET=Debug 
 
-static-Release:
+static-release:
 	$(MAKE) $(MAKEFILE) LIB_CONFIG=static TARGET=Release
 
-$(LIB_FILE): $(BUILD_DIR) $(LIB_DIR) $(TARGET_DIR) $(OBJ_DIR)
+tests: $(LIB_FILE) $(TEST_BIN_DIR) $(TEST_BIN_DIR)/session
 
-$(LIB_DIR):
-	mkdir -p $(LIB_DIR)
+$(TEST_BIN_DIR)/session: $(TST_DIR)/session/main.o
+	@echo "Linking $@"
+	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LIBPATH) $(LIB_FILE) $(LIBS) 
+
+$(TST_DIR)/session/main.o: $(TST_DIR)/session/main.c
+	@echo "Building object '$@'"
+	@$(CC) $(CFLAGS) -o $@ -c $<
+
+$(LIB_FILE): $(BUILD_DIR) $(TARGET_DIR)  
+
+$(TARGET_DIR):
+	@echo "Creating target directory '$(TARGET_DIR)'"
+	@$(MKDIR) -p $(TARGET_DIR)
 
 $(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
-	
-$(TARGET_DIR):
-	mkdir -p $(TARGET_DIR)
+	@echo "Creating build directory '$(BUILD_DIR)'"
+	@$(MKDIR) -p $(BUILD_DIR)
 
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+$(TEST_BIN_DIR):
+	@echo "Creating test bin directory '$(TEST_BIN_DIR)'"
+	@$(MKDIR) -p $(TEST_BIN_DIR)
 	
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) -o $@ -c $<
-	
-$(SHARED_LIB): $(OBJ_FILES) $(OBJ_DIR) $(TARGET_DIR)
-	$(CC) -dynamiclib -o $@ -g $(OBJ_FILES) $(LIBPATH) $(LIBRARIES)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@echo "Building object '$@'"
+	@$(CC) $(CFLAGS) -o $@ -c $<
 
-$(STATIC_LIB): $(OBJ_DIR) $(OBJ_FILES) $(TARGET_DIR)
-	$(LD) -o $@  $(OBJ_FILES) $(LDFLAGS)
+$(SHARED_LIB): $(TARGET_DIR) $(BUILD_DIR) $(OBJ_FILES) 
+	@echo "Linking library '$@'"
+	@$(LD) -o $@  $(OBJ_FILES) -dynamic $(LDFLAGS) $(LIBPATH) $(LIBRARIES)
+
+$(STATIC_LIB): $(TARGET_DIR) $(BUILD_DIR) $(OBJ_FILES)
+	@echo "Linking library '$@'"
+	@$(LD) -o $@  $(OBJ_FILES) -static $(LDFLAGS)
+
 
 depend: dep
 
@@ -128,14 +183,17 @@ dep:
 	makedepend -- $(CFLAGS) -- $(SRC_FILES)
 	
 clobber: clean
-	rm -rf $(BUILD_DIR)
-	rm -rf $(LIB_DIR)
+	@echo "Clobbering..."
+	@$(RM) -rf $(BIN_DIR)
+	@$(RM) -rf $(BUILD_DIR)
+	@$(RM) -rf $(TARGET_DIR)
 
 clean: 
-	rm -f $(BUILD_DIR)/*/*.o
-	rm -f $(LIB_DIR)/*/*.$(STATIC_EXT)
-	rm -f $(LIB_DIR)/*/*.$(SHARED_EXT)
-
+	@echo "Cleaning..."
+	@$(RM) -f $(BUILD_DIR)/*/*.o
+	@$(RM) -f $(TST_DIR)/*/*.o
+	@$(RM) -f $(TARGET_DIR)/*/*.$(STATIC_EXT)
+	@$(RM) -f $(TARGET_DIR)/*/*.$(SHARED_EXT)
 
 .DEFAULT:
 	@echo The target \"$@\" does not exist in this Makefile.	

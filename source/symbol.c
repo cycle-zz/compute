@@ -34,11 +34,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "symbol.h"
 
-static cl_uint
+/**************************************************************************************************/
+
+typedef struct _ce_symbol_t {
+	ce_reference				reference;
+	ce_uint						hash;
+	char* 						name;
+	size_t						length;
+} ce_symbol_t;
+
+/**************************************************************************************************/
+
+static ce_uint
 HashString(const char *str)
 {
     int c;
-    cl_uint hash = 5381;
+    ce_uint hash = 5381;
     
     while ((c = (*str++)) != 0)
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
@@ -78,7 +89,7 @@ ceGetSymbolName(ce_symbol symbol)
 	return s->name;
 }
 
-cl_uint 
+ce_uint 
 ceGetSymbolHash(ce_symbol symbol)
 {
 	ce_symbol_t* s = (ce_symbol_t*)symbol;

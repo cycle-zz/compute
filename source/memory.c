@@ -33,16 +33,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ***************************************************************************************************/
 
 #include "memory.h"
+#include "atomics.h"
 
 /**************************************************************************************************/
 
-typedef struct _ce_session_memory_t {
-	ce_memory_info*					host;
-	ce_memory_info*					device;
-} ce_session_memory_info_t;
+typedef struct _ce_reference_t {
+	ce_session							session;
+	void*								ptr;
+	ce_type_t 							type;
+#if defined(CE_64BIT)
+	ce_atomic_long						count;
+#else
+	ce_atomic_int						count;
+#endif
+} ce_reference_t;
 
 typedef struct _ce_memory_block_t
 {
+	ce_reference_t*						reference;
 	size_t 								size;
 	const char* 						filename;
 	cl_uint 							line;
@@ -64,6 +72,11 @@ typedef struct _ce_memory_info_t
 	size_t 								max_block_size;
 	size_t 								histogram[32];
 } ce_memory_info_t;
+
+typedef struct _ce_session_memory_t {
+	ce_memory_info*						host;
+	ce_memory_info*						device;
+} ce_session_memory_info_t;
 
 /**************************************************************************************************/
 
@@ -132,9 +145,15 @@ void* ceAllocateHostMemory (
     info->allocations++;
     size_t extended = sizeof(ce_memory_block_t) + bytes;
     char* ptr = (char*)malloc(extended);
+    if(!ptr)
+    {
+        ceCritical(session, "Out of host memory!");
+        return 0;
+    }
 
     ce_memory_block_t* block = (ce_memory_block_t*)ptr;
-    block->size = bytes;
+	block->reference = NULL;
+	block->size = bytes;
     block->filename = filename;
     block->line = line;
     InsertBlock(info, block);
@@ -177,7 +196,7 @@ void* ceAllocateHostMemory (
             info->histogram[i]++;
         }
     }
-
+	
     return (void*)ptr;
 }
 
@@ -196,16 +215,32 @@ ceDeallocateHostMemory(
 		return;
 	}
 	
-	info->deallocations++;
-
     if (!ptr)
     {
         return;
     }
 
     ptr -= sizeof(ce_memory_block_t);
-
     ce_memory_block_t* block = (ce_memory_block_t*)ptr;
+    if(block->reference)
+    {
+    	if(block->reference->count)
+		{
+	#if defined(CE_64BIT) 
+			ceAtomicAddLong(&block->reference->count, -1);
+	#else
+			ceAtomicAddInt(&block->reference->count, -1);
+	#endif
+		}
+		
+    	if(block->reference->count)
+			return;		
+			
+		free(block->reference);
+		block->reference = NULL;
+	}
+    	
+	info->deallocations++;
     RemoveBlock(info, block);
 
 	if(info->block_count > 0 && info->byte_count >= block->size)
@@ -221,8 +256,91 @@ ceDeallocateHostMemory(
 	}
 }
 
+ce_reference
+ceCreateReference(
+	ce_session session,
+	void* ptr)
+{
+	ce_session_t* s = (ce_session_t*)session;
+	ce_session_memory_info_t* memory = (ce_session_memory_info_t*)s->memory;
+	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : 0;
+	if(!memory || !info || !ptr)
+		return NULL;
+	
+    volatile ce_memory_block_t* block = (ce_memory_block_t*)(ptr - sizeof(ce_memory_block_t));
+    if(!block)
+    	return NULL;
+    	
+    if(!block->reference)
+    {
+    	block->reference = (ce_reference_t*)malloc(sizeof(ce_reference_t));
+		memset(block->reference, 0, sizeof(ce_reference_t));
 
-void ceLogHostMemoryInfo(
+		block->reference->session = session;
+		block->reference->ptr = ptr;
+    }
+    
+#if defined(CE_64BIT) 
+	ceAtomicAddLong(&(block->reference->count), 1);
+#else
+	ceAtomicAddInt(&(block->reference->count), 1);
+#endif
+	return (ce_reference)block->reference;
+}
+
+void 
+ceRetain(
+	ce_session session, 
+	ce_reference reference)
+{
+	ce_session_t* s = (ce_session_t*)session;
+	ce_session_memory_info_t* memory = (ce_session_memory_info_t*)s->memory;
+	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : 0;
+	void* ptr = ((ce_reference_t*)reference)->ptr;
+	if(!memory || !info || !ptr)
+	{
+		return;
+	}
+	
+    volatile ce_memory_block_t* block = (ce_memory_block_t*)(ptr - sizeof(ce_memory_block_t));
+	if(!block)
+		return;
+    
+    if(!block->reference)
+    {
+    	block->reference = (ce_reference_t*)malloc(sizeof(ce_reference_t));
+		memset(block->reference, 0, sizeof(ce_reference_t));
+
+		block->reference->session = session;
+		block->reference->ptr = ptr;
+    }
+	
+#if defined(CE_64BIT) 
+	ceAtomicAddLong(&(block->reference->count), 1);
+#else
+	ceAtomicAddInt(&(block->reference->count), 1);
+#endif
+}
+
+void 
+ceRelease(
+	ce_session session,
+	ce_reference reference)
+{
+	ce_session_t* s = (ce_session_t*)session;
+	ce_session_memory_info_t* memory = (ce_session_memory_info_t*)s->memory;
+	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : 0;
+	void* ptr = ((ce_reference_t*)reference)->ptr;
+	if(!memory || !info || !ptr)
+	{
+		return;
+	}
+	
+	ceDeallocateHostMemory(session, ptr);
+}
+
+void 
+ceLogHostMemoryInfo(
 	ce_session session)
 {
 	ce_session_t* s = (ce_session_t*)session;
@@ -231,7 +349,7 @@ void ceLogHostMemoryInfo(
 
 	if(!memory || !info)
 	{
-		ceWarning(session, "Host memory tracking not enabled!", info->allocations);
+		ceWarning(session, "Host memory tracking not enabled!");
 		return;
 	}
 		

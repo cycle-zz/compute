@@ -72,8 +72,19 @@ ceDisableDeviceMemoryTracking(ce_session session, cl_device_id device);
 extern CE_API_EXPORT void 
 ceLogDeviceMemoryInfo(ce_session session, cl_device_id device);
 
+extern CE_API_EXPORT ce_reference
+ceCreateReference(ce_session, void* ptr);
+
+extern CE_API_EXPORT void
+ceRetain(ce_session session, ce_reference reference);
+
+extern CE_API_EXPORT void
+ceRelease(ce_session session, ce_reference reference);
+
 /**************************************************************************************************/
 
 CE_EXTERN_C_END
+
+/**************************************************************************************************/
 
 #endif /* __CE_MEMORY_H__ */
