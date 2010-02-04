@@ -45,6 +45,8 @@ CE_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
+#define CE_DEFAULT_SESSION	(NULL)
+
 typedef struct _ce_session_t {
     cl_platform_id											platform;
     cl_context 												context;

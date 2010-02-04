@@ -22,6 +22,12 @@
 		C32A847611145A6A004AD8CC /* session.h in Headers */ = {isa = PBXBuildFile; fileRef = C32A846E11145A6A004AD8CC /* session.h */; };
 		C32A847711145A6A004AD8CC /* symbol.h in Headers */ = {isa = PBXBuildFile; fileRef = C32A846F11145A6A004AD8CC /* symbol.h */; };
 		C32A848111145B47004AD8CC /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C32A848011145B47004AD8CC /* OpenCL.framework */; };
+		C3AE4A89111AAA9C000AE6F6 /* options.c in Sources */ = {isa = PBXBuildFile; fileRef = C3AE4A87111AAA9C000AE6F6 /* options.c */; };
+		C3AE4A8A111AAA9C000AE6F6 /* stack.c in Sources */ = {isa = PBXBuildFile; fileRef = C3AE4A88111AAA9C000AE6F6 /* stack.c */; };
+		C3AE4A8F111AAAA9000AE6F6 /* atomics.h in Headers */ = {isa = PBXBuildFile; fileRef = C3AE4A8B111AAAA9000AE6F6 /* atomics.h */; };
+		C3AE4A90111AAAA9000AE6F6 /* options.h in Headers */ = {isa = PBXBuildFile; fileRef = C3AE4A8C111AAAA9000AE6F6 /* options.h */; };
+		C3AE4A91111AAAA9000AE6F6 /* stack.h in Headers */ = {isa = PBXBuildFile; fileRef = C3AE4A8D111AAAA9000AE6F6 /* stack.h */; };
+		C3AE4A92111AAAA9000AE6F6 /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = C3AE4A8E111AAAA9000AE6F6 /* types.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +46,12 @@
 		C32A846E11145A6A004AD8CC /* session.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = session.h; sourceTree = "<group>"; };
 		C32A846F11145A6A004AD8CC /* symbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = symbol.h; sourceTree = "<group>"; };
 		C32A848011145B47004AD8CC /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = /System/Library/Frameworks/OpenCL.framework; sourceTree = "<absolute>"; };
+		C3AE4A87111AAA9C000AE6F6 /* options.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = options.c; path = ../source/options.c; sourceTree = SOURCE_ROOT; };
+		C3AE4A88111AAA9C000AE6F6 /* stack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stack.c; path = ../source/stack.c; sourceTree = SOURCE_ROOT; };
+		C3AE4A8B111AAAA9000AE6F6 /* atomics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = atomics.h; sourceTree = "<group>"; };
+		C3AE4A8C111AAAA9000AE6F6 /* options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = options.h; sourceTree = "<group>"; };
+		C3AE4A8D111AAAA9000AE6F6 /* stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
+		C3AE4A8E111AAAA9000AE6F6 /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
 		D2AAC0630554660B00DB518D /* libcompute.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcompute.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -69,6 +81,8 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				C3AE4A87111AAA9C000AE6F6 /* options.c */,
+				C3AE4A88111AAA9C000AE6F6 /* stack.c */,
 				C32A845B11145A61004AD8CC /* logging.c */,
 				C32A845C11145A61004AD8CC /* map.c */,
 				C32A845D11145A61004AD8CC /* memory.c */,
@@ -90,6 +104,10 @@
 		C32A846711145A6A004AD8CC /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				C3AE4A8B111AAAA9000AE6F6 /* atomics.h */,
+				C3AE4A8C111AAAA9000AE6F6 /* options.h */,
+				C3AE4A8D111AAAA9000AE6F6 /* stack.h */,
+				C3AE4A8E111AAAA9000AE6F6 /* types.h */,
 				C32A846811145A6A004AD8CC /* compute.h */,
 				C32A846911145A6A004AD8CC /* logging.h */,
 				C32A846A11145A6A004AD8CC /* map.h */,
@@ -126,6 +144,10 @@
 				C32A847511145A6A004AD8CC /* profiling.h in Headers */,
 				C32A847611145A6A004AD8CC /* session.h in Headers */,
 				C32A847711145A6A004AD8CC /* symbol.h in Headers */,
+				C3AE4A8F111AAAA9000AE6F6 /* atomics.h in Headers */,
+				C3AE4A90111AAAA9000AE6F6 /* options.h in Headers */,
+				C3AE4A91111AAAA9000AE6F6 /* stack.h in Headers */,
+				C3AE4A92111AAAA9000AE6F6 /* types.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -177,6 +199,8 @@
 				C32A846411145A61004AD8CC /* profiling.c in Sources */,
 				C32A846511145A61004AD8CC /* session.c in Sources */,
 				C32A846611145A61004AD8CC /* symbol.c in Sources */,
+				C3AE4A89111AAA9C000AE6F6 /* options.c in Sources */,
+				C3AE4A8A111AAA9C000AE6F6 /* stack.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

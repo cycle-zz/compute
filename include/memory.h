@@ -49,24 +49,24 @@ CE_EXTERN_C_BEGIN
 extern CE_API_EXPORT 
 void* ceAllocateHostMemory(ce_session session, size_t bytes, char* filename, unsigned int line);
 
-extern CE_API_EXPORT  
-void ceDeallocateHostMemory(ce_session session, void* ptr);
+extern CE_API_EXPORT ce_status 
+ceDeallocateHostMemory(ce_session session, void* ptr);
 
 /**************************************************************************************************/
 
-extern CE_API_EXPORT cl_int
+extern CE_API_EXPORT ce_status
 ceEnableHostMemoryTracking(ce_session session);
 
-extern CE_API_EXPORT cl_int
+extern CE_API_EXPORT ce_status
 ceDisableHostMemoryTracking(ce_session session);
 
-extern CE_API_EXPORT void 
+extern CE_API_EXPORT ce_status 
 ceLogHostMemoryInfo(ce_session session);
 
-extern CE_API_EXPORT cl_int
+extern CE_API_EXPORT ce_status
 ceEnableDeviceMemoryTracking(ce_session session, cl_device_id device);
 
-extern CE_API_EXPORT cl_int
+extern CE_API_EXPORT ce_status
 ceDisableDeviceMemoryTracking(ce_session session, cl_device_id device);
 
 extern CE_API_EXPORT void 
@@ -75,10 +75,10 @@ ceLogDeviceMemoryInfo(ce_session session, cl_device_id device);
 extern CE_API_EXPORT ce_reference
 ceCreateReference(ce_session, void* ptr);
 
-extern CE_API_EXPORT void
+extern CE_API_EXPORT ce_status
 ceRetain(ce_session session, ce_reference reference);
 
-extern CE_API_EXPORT void
+extern CE_API_EXPORT ce_status
 ceRelease(ce_session session, ce_reference reference);
 
 /**************************************************************************************************/

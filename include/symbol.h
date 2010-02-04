@@ -54,6 +54,9 @@ ceReleaseSymbol(ce_symbol symbol);
 extern CE_API_EXPORT const char*
 ceGetSymbolName(ce_symbol symbol);
 
+extern CE_API_EXPORT ce_bool
+ceIsSymbolNameEqual(ce_symbol a, ce_symbol b);
+
 extern CE_API_EXPORT ce_uint
 ceGetSymbolHash(ce_symbol symbol);
 

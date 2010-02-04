@@ -80,13 +80,13 @@ ceCreateMap(
 
 void
 ceReleaseMap(
-	ce_map opaque)
+	ce_map handle)
 {
     ce_map_node_t *node = NULL;
     ce_map_node_t *next = NULL;
     ce_map_index_t index = 0;
 
-	ce_map_t* map = (ce_map_t*)opaque;
+	ce_map_t* map = (ce_map_t*)handle;
 	ce_session session = map->session;
 	
 	while(index < map->size)
@@ -107,7 +107,7 @@ ceReleaseMap(
 
 cl_int
 ceMapInsert(
-	ce_map opaque, 
+	ce_map handle, 
 	ce_symbol key, 
 	ce_reference item)
 {
@@ -115,7 +115,7 @@ ceMapInsert(
     ce_map_node_t *next = NULL;
     ce_map_index_t index = 0;
 
-	ce_map_t* map = (ce_map_t*)opaque;
+	ce_map_t* map = (ce_map_t*)handle;
 	
 	index = ceGetSymbolHash(key) % map->size;
 
@@ -135,7 +135,7 @@ ceMapInsert(
 
 ce_reference 
 ceMapRemove(
-	ce_map opaque, 
+	ce_map handle, 
 	ce_symbol key)
 {
     ce_map_node_t *node = NULL;
@@ -143,7 +143,7 @@ ceMapRemove(
     ce_map_index_t index = 0;
     ce_reference item = NULL;
 
-	ce_map_t* map = (ce_map_t*)opaque;
+	ce_map_t* map = (ce_map_t*)handle;
 	
     index = ceGetSymbolHash(key) % map->size;
     node = map->bins[index];
@@ -171,13 +171,13 @@ ceMapRemove(
 
 ce_reference
 ceGetMapItem(
-	ce_map opaque, 
+	ce_map handle, 
 	ce_symbol key)
 {
     ce_map_node_t *node = NULL;
     ce_map_index_t index = 0;
 
-	ce_map_t* map = (ce_map_t*)opaque;
+	ce_map_t* map = (ce_map_t*)handle;
 
 	index = ceGetSymbolHash(key) % map->size;
     node = map->bins[index];

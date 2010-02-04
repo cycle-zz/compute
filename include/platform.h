@@ -118,99 +118,6 @@ CE_EXTERN_C_BEGIN
 	#define CE_ALIGN_ATTRIBUTE(x)
 #endif
 
-/* platform types *************************************************************/
-
-#if (CE_PLATFORM_WINDOWS)
-
-#define _CE_INT8_ 			signed   __int8
-#define _CE_UINT8_			unsigned __int8
-#define _CE_INT16_			signed   __int16
-#define _CE_UINT16_			unsigned __int16
-#define _CE_INT32_			signed   __int32
-#define _CE_UINT32_			unsigned __int32
-#define _CE_INT64_			signed   __int64
-#define _CE_UINT64_			unsigned __int64
-
-#else
-
-#include <stdint.h>
-
-#define _CE_INT8_         	int8_t
-#define _CE_UINT8_			uint8_t
-#define _CE_INT16_			int16_t
-#define _CE_UINT16_			uint16_t
-#define _CE_INT32_			int32_t
-#define _CE_UINT32_			uint32_t
-#define _CE_INT64_			int64_t
-#define _CE_UINT64_			uint64_t
-
-#endif
-
-/* Scalar Types (aligned) *************************************************************/
-
-typedef _CE_INT8_      		ce_char;
-typedef _CE_UINT8_         	ce_uchar;
-typedef _CE_INT16_         	ce_short    		CE_ALIGN_ATTRIBUTE(2);
-typedef _CE_UINT16_        	ce_ushort   		CE_ALIGN_ATTRIBUTE(2);
-typedef _CE_INT32_         	ce_int      		CE_ALIGN_ATTRIBUTE(4);
-typedef _CE_UINT32_        	ce_uint     		CE_ALIGN_ATTRIBUTE(4);
-typedef _CE_INT64_         	ce_long     		CE_ALIGN_ATTRIBUTE(8);
-typedef _CE_UINT64_        	ce_ulong    		CE_ALIGN_ATTRIBUTE(8);
-typedef _CE_UINT16_        	ce_half     		CE_ALIGN_ATTRIBUTE(2);
-typedef float              	ce_float    		CE_ALIGN_ATTRIBUTE(4);
-typedef double             	ce_double   		CE_ALIGN_ATTRIBUTE(8);
-typedef ce_uint				ce_bitfield;
-typedef ce_ulong			ce_hashcode;
-typedef ce_uint				ce_bool;
-
-/* Vector Types (aligned) *************************************************************/
-
-typedef _CE_INT8_          	ce_char2[2]     	CE_ALIGN_ATTRIBUTE(2);
-typedef _CE_INT8_          	ce_char4[4]     	CE_ALIGN_ATTRIBUTE(4);
-typedef _CE_INT8_          	ce_char8[8]     	CE_ALIGN_ATTRIBUTE(8);
-typedef _CE_INT8_          	ce_char16[16]   	CE_ALIGN_ATTRIBUTE(16);
-typedef _CE_UINT8_         	ce_uchar2[2]    	CE_ALIGN_ATTRIBUTE(2);
-typedef _CE_UINT8_         	ce_uchar4[4]    	CE_ALIGN_ATTRIBUTE(4);
-typedef _CE_UINT8_         	ce_uchar8[8]    	CE_ALIGN_ATTRIBUTE(8);
-typedef _CE_UINT8_         	ce_uchar16[16]  	CE_ALIGN_ATTRIBUTE(16);
-typedef _CE_INT16_         	ce_short2[2]     	CE_ALIGN_ATTRIBUTE(4);
-typedef _CE_INT16_         	ce_short4[4]     	CE_ALIGN_ATTRIBUTE(8);
-typedef _CE_INT16_         	ce_short8[8]     	CE_ALIGN_ATTRIBUTE(16);
-typedef _CE_INT16_         	ce_short16[16]   	CE_ALIGN_ATTRIBUTE(32);
-typedef _CE_UINT16_        	ce_ushort2[2]    	CE_ALIGN_ATTRIBUTE(4);
-typedef _CE_UINT16_        	ce_ushort4[4]    	CE_ALIGN_ATTRIBUTE(8);
-typedef _CE_UINT16_        	ce_ushort8[8]    	CE_ALIGN_ATTRIBUTE(16);
-typedef _CE_UINT16_        	ce_ushort16[16]  	CE_ALIGN_ATTRIBUTE(32);
-typedef _CE_INT32_         	ce_int2[2]      	CE_ALIGN_ATTRIBUTE(8);
-typedef _CE_INT32_         	ce_int4[4]      	CE_ALIGN_ATTRIBUTE(16);
-typedef _CE_INT32_         	ce_int8[8]      	CE_ALIGN_ATTRIBUTE(32);
-typedef _CE_INT32_         	ce_int16[16]    	CE_ALIGN_ATTRIBUTE(64);
-typedef _CE_UINT32_        	ce_uint2[2]     	CE_ALIGN_ATTRIBUTE(8);
-typedef _CE_UINT32_        	ce_uint4[4]     	CE_ALIGN_ATTRIBUTE(16);
-typedef _CE_UINT32_        	ce_uint8[8]     	CE_ALIGN_ATTRIBUTE(32);
-typedef _CE_UINT32_        	ce_uint16[16]   	CE_ALIGN_ATTRIBUTE(64);
-typedef _CE_INT64_         	ce_long2[2]     	CE_ALIGN_ATTRIBUTE(16);
-typedef _CE_INT64_         	ce_long4[4]     	CE_ALIGN_ATTRIBUTE(32);
-typedef _CE_INT64_         	ce_long8[8]     	CE_ALIGN_ATTRIBUTE(64);
-typedef _CE_INT64_         	ce_long16[16]   	CE_ALIGN_ATTRIBUTE(128);
-typedef _CE_UINT64_        	ce_ulong2[2]    	CE_ALIGN_ATTRIBUTE(16);
-typedef _CE_UINT64_        	ce_ulong4[4]    	CE_ALIGN_ATTRIBUTE(32);
-typedef _CE_UINT64_        	ce_ulong8[8]    	CE_ALIGN_ATTRIBUTE(64);
-typedef _CE_UINT64_        	ce_ulong16[16]  	CE_ALIGN_ATTRIBUTE(128);
-typedef float              	ce_float2[2]    	CE_ALIGN_ATTRIBUTE(8);
-typedef float              	ce_float4[4]    	CE_ALIGN_ATTRIBUTE(16);
-typedef float              	ce_float8[8]    	CE_ALIGN_ATTRIBUTE(32);
-typedef float              	ce_float16[16]  	CE_ALIGN_ATTRIBUTE(64);
-typedef double             	ce_double2[2]   	CE_ALIGN_ATTRIBUTE(16);
-typedef double             	ce_double4[4]   	CE_ALIGN_ATTRIBUTE(32);
-typedef double             	ce_double8[8]   	CE_ALIGN_ATTRIBUTE(64);
-typedef double             	ce_double16[16] 	CE_ALIGN_ATTRIBUTE(128);
-
-/* Boolean Values *************************************************************/
-
-#define CE_TRUE				(1)
-#define CE_FALSE			(0)
-
 /* Helper Macros **************************************************************/
 
 #define CE_CONCAT(a,b)		a##b
@@ -239,11 +146,21 @@ typedef double             	ce_double16[16] 	CE_ALIGN_ATTRIBUTE(128);
 /* Standard Headers ***********************************************************/
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <limits.h>
 #include <float.h>
 #include <math.h>
 #include <ctype.h>
+
+#if defined(CE_DEBUG_BUILD)
+#define ceAssert(expr) \
+    ((expr) ? (void)0 : \
+        ceCritical(CE_DEFAULT_SESSION, "Assertion \"%s\" failed in %s, line %d!\n", \
+               #expr, __FILE__, __LINE__))
+#else
+#define ceAssert(expr) do{ } while(0)
+#endif
 
 /******************************************************************************/
 

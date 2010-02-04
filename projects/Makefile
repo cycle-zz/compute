@@ -2,9 +2,13 @@
 
 PROJECT_NAME	:= ce
 BASE_DIR		:= ..
-SRC_DIR 		:= ../source
-TST_DIR 		:= ../tests
-INCLUDE 		:= -I. -I$(BASE_DIR) -I$(BASE_DIR)/include
+BIN_DIR 		:= $(BASE_DIR)/bin
+LIB_DIR 		:= $(BASE_DIR)/lib
+SRC_DIR 		:= $(BASE_DIR)/source
+BUILD_DIR 		:= $(BASE_DIR)/build
+TST_DIR 		:= $(BASE_DIR)/tests
+INC_DIR			:= $(BASE_DIR)/include
+INCLUDE 		:= -I. -I$(INC_DIR) -I$(SRC_DIR)
 USE_PTHREADS	:= 1
 
 # Tools ############################################################################################
@@ -56,7 +60,7 @@ endif
 # Target Settings ##################################################################################
 
 ifeq ($(TARGET),)
-	TARGET		:= Release
+	TARGET		:= Debug
 endif
 
 ifeq ($(TARGET),Release)
@@ -77,27 +81,33 @@ endif
 
 # Build Configuration ##############################################################################
 
-TEST_BIN_DIR 	:= $(BASE_DIR)/bin/$(OS_NAME)/$(ARCH)/$(TARGET)
-TARGET_DIR		:= $(BASE_DIR)/lib/$(OS_NAME)/$(ARCH)/$(TARGET)
-BUILD_DIR 		:= $(BASE_DIR)/build/$(OS_NAME)/$(ARCH)/$(TARGET)
-STATIC_LIB		:= $(TARGET_DIR)/lib$(PROJECT_NAME).$(STATIC_EXT)
-SHARED_LIB		:= $(TARGET_DIR)/lib$(PROJECT_NAME).$(SHARED_EXT)
+# Target
+TGT_LIB_DIR		:= $(BASE_DIR)/lib/$(OS_NAME)/$(ARCH)/$(TARGET)
+TGT_BUILD_DIR 	:= $(BASE_DIR)/build/$(OS_NAME)/$(ARCH)/$(TARGET)
+TGT_STATIC_LIB	:= $(TGT_LIB_DIR)/lib$(PROJECT_NAME).$(STATIC_EXT)
+TGT_SHARED_LIB	:= $(TGT_LIB_DIR)/lib$(PROJECT_NAME).$(SHARED_EXT)
+
+# Compilation
 SRC_FILES		:= $(shell ls $(SRC_DIR)/*.c)
-OBJ_FILES		:= $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
+OBJ_FILES		:= $(patsubst $(SRC_DIR)/%.c,$(TGT_BUILD_DIR)/%.o,$(SRC_FILES))
 HDR_FILES		:= $(shell ls $(BASE_DIR)/include/*.h)
+
+# Tests
+TST_BIN_DIR 	:= $(BASE_DIR)/bin/$(OS_NAME)/$(ARCH)/$(TARGET)
 TST_BUILD_DIR 	:= $(BASE_DIR)/build/$(OS_NAME)/$(ARCH)/Tests
 TST_DIR_LIST	:= $(shell ls -d $(TST_DIR)/*)
 TST_SRC_FILES	:= $(shell ls $(TST_DIR)/*/*.c)
 TST_OBJ_FILES	:= $(patsubst %.c,%.o,$(TST_SRC_FILES))
-TEST_NAMES		:= $(notdir $(wildcard $(TST_DIR)/*))
-TEST_BINS		:= $(addprefix bin/, $(TEST_NAMES))
-LIBPATH 		+= -L$(TARGET_DIR)
+TST_NAMES		:= $(notdir $(wildcard $(TST_DIR)/*))
+TST_BINS		:= $(addprefix bin/, $(TST_NAMES))
+
+LIBPATH 		+= -L$(TGT_LIB_DIR)
 
 ifeq ($(LIB_CONFIG),static)
-	LIB_FILE	:= $(STATIC_LIB)
+	LIB_FILE	:= $(TGT_STATIC_LIB)
 	DEFINES		+= -DCE_STATIC_LIB_TARGET
 else
-	LIB_FILE	:= $(SHARED_LIB)	
+	LIB_FILE	:= $(TGT_SHARED_LIB)	
 	DEFINES		+= -DCE_SHARED_LIB_TARGET -DCE_SHARED_LIB_EXPORT 
 	ifeq ($(OS_NAME),Darwin)
 		LDFLAGS		+= -flat_namespace -undefined suppress -bundle -noprebind
@@ -107,8 +117,7 @@ endif
 BUILD_OPTIONS 	:= -c -Wall -std=c99
 CFLAGS 			:= $(BUILD_OPTIONS) $(DEFINES) $(ARCH_FLAGS) $(OPT_FLAGS) $(DBG_FLAGS) $(INCLUDE) 
 
-
-# Rules ############################################################################################
+# Target Rules #####################################################################################
 
 default: $(LIB_FILE)
 
@@ -124,7 +133,7 @@ Debug:
 debug:
 	$(MAKE) $(MAKEFILE) TARGET=Debug 
 
-shared: $(SHARED_LIB)
+shared: $(TGT_SHARED_LIB)
 
 shared-debug:
 	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared TARGET=Debug 
@@ -132,7 +141,7 @@ shared-debug:
 shared-release:
 	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared TARGET=Release
 
-static: $(STATIC_LIB)
+static: $(TGT_STATIC_LIB)
 
 static-debug:
 	$(MAKE) $(MAKEFILE) LIB_CONFIG=static TARGET=Debug 
@@ -140,42 +149,31 @@ static-debug:
 static-release:
 	$(MAKE) $(MAKEFILE) LIB_CONFIG=static TARGET=Release
 
-tests: $(LIB_FILE) $(TEST_BIN_DIR) $(TEST_BIN_DIR)/session
+$(LIB_FILE): $(TGT_BUILD_DIR) $(TGT_LIB_DIR)  
 
-$(TEST_BIN_DIR)/session: $(TST_DIR)/session/main.o
-	@echo "Linking $@"
-	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LIBPATH) $(LIB_FILE) $(LIBS) 
+$(TGT_LIB_DIR):
+	@echo "Creating target directory '$(TGT_LIB_DIR)'"
+	@$(MKDIR) -p $(TGT_LIB_DIR)
 
-$(TST_DIR)/session/main.o: $(TST_DIR)/session/main.c
-	@echo "Building object '$@'"
-	@$(CC) $(CFLAGS) -o $@ -c $<
+$(TGT_BUILD_DIR):
+	@echo "Creating build directory '$(TGT_BUILD_DIR)'"
+	@$(MKDIR) -p $(TGT_BUILD_DIR)
 
-$(LIB_FILE): $(BUILD_DIR) $(TARGET_DIR)  
-
-$(TARGET_DIR):
-	@echo "Creating target directory '$(TARGET_DIR)'"
-	@$(MKDIR) -p $(TARGET_DIR)
-
-$(BUILD_DIR):
-	@echo "Creating build directory '$(BUILD_DIR)'"
-	@$(MKDIR) -p $(BUILD_DIR)
-
-$(TEST_BIN_DIR):
-	@echo "Creating test bin directory '$(TEST_BIN_DIR)'"
-	@$(MKDIR) -p $(TEST_BIN_DIR)
+$(TST_BIN_DIR):
+	@echo "Creating test bin directory '$(TST_BIN_DIR)'"
+	@$(MKDIR) -p $(TST_BIN_DIR)
 	
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+$(TGT_BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo "Building object '$@'"
 	@$(CC) $(CFLAGS) -o $@ -c $<
 
-$(SHARED_LIB): $(TARGET_DIR) $(BUILD_DIR) $(OBJ_FILES) 
+$(TGT_SHARED_LIB): $(TGT_LIB_DIR) $(TGT_BUILD_DIR) $(OBJ_FILES) 
 	@echo "Linking library '$@'"
 	@$(LD) -o $@  $(OBJ_FILES) -dynamic $(LDFLAGS) $(LIBPATH) $(LIBRARIES)
 
-$(STATIC_LIB): $(TARGET_DIR) $(BUILD_DIR) $(OBJ_FILES)
+$(TGT_STATIC_LIB): $(TGT_LIB_DIR) $(TGT_BUILD_DIR) $(OBJ_FILES)
 	@echo "Linking library '$@'"
 	@$(LD) -o $@  $(OBJ_FILES) -static $(LDFLAGS)
-
 
 depend: dep
 
@@ -184,19 +182,33 @@ dep:
 	
 clobber: clean
 	@echo "Clobbering..."
-	@$(RM) -rf $(BIN_DIR)
-	@$(RM) -rf $(BUILD_DIR)
-	@$(RM) -rf $(TARGET_DIR)
+	@$(RM) -rf $(BUILD_DIR)/*
+	@$(RM) -rf $(LIB_DIR)/*
+	@$(RM) -rf $(BIN_DIR)/*
 
 clean: 
 	@echo "Cleaning..."
 	@$(RM) -f $(BUILD_DIR)/*/*.o
-	@$(RM) -f $(TST_DIR)/*/*.o
-	@$(RM) -f $(TARGET_DIR)/*/*.$(STATIC_EXT)
-	@$(RM) -f $(TARGET_DIR)/*/*.$(SHARED_EXT)
+	@$(RM) -f $(TST_DIR)/*/*/*.o
+	@$(RM) -f $(LIB_DIR)/*/*/*.*
+	@$(RM) -f $(BIN_DIR)/*/*/*/*
 
 .DEFAULT:
 	@echo The target \"$@\" does not exist in this Makefile.	
+
+# Test Rules #######################################################################################
+
+tests: $(LIB_FILE) $(TST_BIN_DIR) $(TST_BIN_DIR)/options
+
+$(TST_BIN_DIR)/options: $(TST_DIR)/options/main.o
+	@echo "Linking $@"
+	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LIBPATH) $(LIB_FILE) $(LIBS) 
+
+$(TST_DIR)/options/main.o: $(TST_DIR)/options/main.c
+	@echo "Building object '$@'"
+	@$(CC) $(CFLAGS) -o $@ -c $<
+
+
 	
 # DO NOT DELETE
 

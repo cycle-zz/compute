@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __COMPUTE_H__
-#define __COMPUTE_H__
+#ifndef __CE_COMPUTE_H__
+#define __CE_COMPUTE_H__
 
 #include "platform.h"
 
@@ -41,38 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 CE_EXTERN_C_BEGIN
 
-/**************************************************************************************************/
+/* Types ******************************************************************************************/
 
-typedef enum _ce_type_t {
-	CE_TYPE_INVALID,
-	CE_TYPE_REFERENCE,
-	CE_TYPE_DEVICE,
-	CE_TYPE_QUEUE,
-	CE_TYPE_MEM,
-	CE_TYPE_PROGRAM,
-	CE_TYPE_KERNEL,
-	CE_TYPE_LOG,
-	CE_TYPE_MAP,
-	CE_TYPE_STACK,
-	CE_TYPE_SYMBOL,
-	CE_TYPE_MEMORY_INFO,
-	CE_TYPE_LOGGING_INFO,
-	CE_TYPE_PROFILING_INFO,
-	CE_TYPE_UNKNOWN
-} ce_type_t;
-
-/**************************************************************************************************/
-
-typedef struct _ce_session *    			ce_session;
-typedef struct _ce_reference*	 			ce_reference;
-typedef struct _ce_log* 		 			ce_log;
-typedef struct _ce_map* 		 			ce_map;
-typedef struct _ce_stack* 		 			ce_stack;
-typedef struct _ce_symbol* 	 				ce_symbol;
-typedef struct _ce_session_memory_info* 	ce_session_memory_info;
-typedef struct _ce_memory_info*  		 	ce_memory_info;
-typedef struct _ce_logging_info*  		 	ce_logging_info;
-typedef struct _ce_profiling_info*    	 	ce_profiling_info;
+#include "types.h"
 
 /* Memory *****************************************************************************************/
 
@@ -94,6 +65,10 @@ typedef struct _ce_profiling_info*    	 	ce_profiling_info;
 /** Profiling *************************************************************************************/
 
 #include "profiling.h"
+
+/** Options ***************************************************************************************/
+
+#include "options.h"
 
 /**************************************************************************************************/
 

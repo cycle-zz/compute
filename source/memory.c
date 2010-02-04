@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
+typedef ce_type							ce_type_t;
+
 typedef struct _ce_reference_t {
 	ce_session							session;
 	void*								ptr;
@@ -129,27 +131,51 @@ RemoveBlock (
 
 /**************************************************************************************************/
 
-void* ceAllocateHostMemory (
-	ce_session session,
+static void*
+HostMalloc(size_t size)
+{
+	void* ptr = (void*)malloc(size);
+	if(!ptr)
+	{
+		ceCritical(CE_DEFAULT_SESSION, "Out of host memory!");
+		return 0;
+	}
+
+	ceDebug(CE_DEFAULT_SESSION, "HostMalloc: Allocated '%p' '%04d' bytes\n", ptr, size);
+	return ptr;
+}
+
+static void
+HostFree(void* ptr)
+{
+	ceDebug(CE_DEFAULT_SESSION, "HostFree: Freeing '%p'\n", ptr);
+	free(ptr);
+}
+
+/**************************************************************************************************/
+
+void* 
+ceAllocateHostMemory (
+	ce_session handle,
 	size_t bytes, 
 	char* filename, 
 	unsigned int line)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_session_memory_info_t* memory = (ce_session_memory_info_t*)s->memory;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : 0;
+	ce_session_t* session = (ce_session_t*)handle;
+	ce_session_memory_info_t* memory = session ? (ce_session_memory_info_t*)session->memory : NULL;
+	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : NULL;
 
-	if(!memory || !info)
-		return malloc(bytes);
+	if(!session || !memory || !info)
+	{
+		return HostMalloc(bytes);
+	}
 
     info->allocations++;
     size_t extended = sizeof(ce_memory_block_t) + bytes;
-    char* ptr = (char*)malloc(extended);
+
+    char* ptr = (char*)HostMalloc(extended);
     if(!ptr)
-    {
-        ceCritical(session, "Out of host memory!");
         return 0;
-    }
 
     ce_memory_block_t* block = (ce_memory_block_t*)ptr;
 	block->reference = NULL;
@@ -165,7 +191,7 @@ void* ceAllocateHostMemory (
 
     if (info->max_allowed_bytes > 0 && info->byte_count > info->max_allowed_bytes)
     {
-        ceWarning(session, "Allocation has exceeded the maximum number of allowed bytes!");
+        ceWarning(handle, "Allocation has exceeded the maximum number of allowed bytes!");
         return 0;
     }
 
@@ -200,24 +226,24 @@ void* ceAllocateHostMemory (
     return (void*)ptr;
 }
 
-
-void 
+ce_status
 ceDeallocateHostMemory(
-	ce_session session, void* ptr)
+	ce_session handle, 
+	void* ptr)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_session_memory_info_t* memory = (ce_session_memory_info_t*)s->memory;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : 0;
+	ce_session_t* session = (ce_session_t*)handle;
+	ce_session_memory_info_t* memory = session ? (ce_session_memory_info_t*)session->memory : NULL;
+	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : NULL;
 
-	if(!memory || !info)
+	if(!session || !memory || !info)
 	{
-		free(ptr);
-		return;
+		HostFree(ptr);
+		return CE_SUCCESS;
 	}
 	
     if (!ptr)
     {
-        return;
+        return CE_INVALID_VALUE;
     }
 
     ptr -= sizeof(ce_memory_block_t);
@@ -234,9 +260,9 @@ ceDeallocateHostMemory(
 		}
 		
     	if(block->reference->count)
-			return;		
+			return CE_SUCCESS;		
 			
-		free(block->reference);
+		HostFree(block->reference);
 		block->reference = NULL;
 	}
     	
@@ -247,25 +273,29 @@ ceDeallocateHostMemory(
 	{
 		info->block_count--;
 		info->byte_count -= block->size;
-		free(ptr);
+		HostFree(ptr);
 	}
 	else
 	{
-        ceWarning(session, "Deallocation size mismatch for memory block!");
-		return;
+        ceWarning(handle, "Deallocation size mismatch for memory block!");
+		return CE_SIZE_MISMATCH;
 	}
+	return CE_SUCCESS;
 }
 
 ce_reference
 ceCreateReference(
-	ce_session session,
+	ce_session handle,
 	void* ptr)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_session_memory_info_t* memory = (ce_session_memory_info_t*)s->memory;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : 0;
-	if(!memory || !info || !ptr)
+	ce_session_t* session = (ce_session_t*)handle;
+	ce_session_memory_info_t* memory = session ? (ce_session_memory_info_t*)session->memory : NULL;
+	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : NULL;
+
+	if(!session || !memory || !info)
+	{
 		return NULL;
+	}
 	
     volatile ce_memory_block_t* block = (ce_memory_block_t*)(ptr - sizeof(ce_memory_block_t));
     if(!block)
@@ -276,7 +306,7 @@ ceCreateReference(
     	block->reference = (ce_reference_t*)malloc(sizeof(ce_reference_t));
 		memset(block->reference, 0, sizeof(ce_reference_t));
 
-		block->reference->session = session;
+		block->reference->session = handle;
 		block->reference->ptr = ptr;
     }
     
@@ -288,30 +318,29 @@ ceCreateReference(
 	return (ce_reference)block->reference;
 }
 
-void 
+ce_status 
 ceRetain(
-	ce_session session, 
+	ce_session handle, 
 	ce_reference reference)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_session_memory_info_t* memory = (ce_session_memory_info_t*)s->memory;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : 0;
-	void* ptr = ((ce_reference_t*)reference)->ptr;
-	if(!memory || !info || !ptr)
-	{
-		return;
-	}
-	
+	ce_session_t* session = (ce_session_t*)handle;
+	ce_session_memory_info_t* memory = session ? (ce_session_memory_info_t*)session->memory : NULL;
+	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : NULL;
+	void* ptr = reference ? ((ce_reference_t*)reference)->ptr : NULL;
+
+	if(!session || !memory || !info || !ptr)
+		return CE_INVALID_MEMORY_INFO;
+
     volatile ce_memory_block_t* block = (ce_memory_block_t*)(ptr - sizeof(ce_memory_block_t));
 	if(!block)
-		return;
+		return CE_INVALID_MEMORY_INFO;
     
     if(!block->reference)
     {
     	block->reference = (ce_reference_t*)malloc(sizeof(ce_reference_t));
 		memset(block->reference, 0, sizeof(ce_reference_t));
 
-		block->reference->session = session;
+		block->reference->session = handle;
 		block->reference->ptr = ptr;
     }
 	
@@ -320,37 +349,31 @@ ceRetain(
 #else
 	ceAtomicAddInt(&(block->reference->count), 1);
 #endif
+
+	return CE_SUCCESS;
 }
 
-void 
+ce_status
 ceRelease(
-	ce_session session,
+	ce_session handle,
 	ce_reference reference)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_session_memory_info_t* memory = (ce_session_memory_info_t*)s->memory;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : 0;
-	void* ptr = ((ce_reference_t*)reference)->ptr;
-	if(!memory || !info || !ptr)
-	{
-		return;
-	}
-	
-	ceDeallocateHostMemory(session, ptr);
+	void* ptr = reference ? ((ce_reference_t*)reference)->ptr : NULL;
+	return ceDeallocateHostMemory(handle, ptr);
 }
 
-void 
+ce_status
 ceLogHostMemoryInfo(
-	ce_session session)
+	ce_session handle)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_session_memory_info_t* memory = (ce_session_memory_info_t*)s->memory;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : 0;
+	ce_session_t* session = (ce_session_t*)handle;
+	ce_session_memory_info_t* memory = session ? (ce_session_memory_info_t*)session->memory : NULL;
+	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : NULL;
 
-	if(!memory || !info)
+	if(!session || !memory || !info)
 	{
-		ceWarning(session, "Host memory tracking not enabled!");
-		return;
+		ceWarning(handle, "Host memory tracking not enabled!");
+		return CE_INVALID_MEMORY_INFO;
 	}
 		
 	size_t index = 0;
@@ -360,11 +383,11 @@ ceLogHostMemoryInfo(
     size_t anonymous_byte_count = 0;
     ce_memory_block_t* block = 0;
 
-	ceInfo(session, "Total number of host memory allocations: %d", info->allocations);
-	ceInfo(session, "Total number of host memory deallocations: %d", info->deallocations);
-	ceInfo(session, "Maximum number of bytes allocated in host memory: %d", info->max_allocated_bytes);
-	ceInfo(session, "Number of blocks in host memory still allocated: %d", info->block_count);
-	ceInfo(session, "Number of bytes in host memory still allocated: %d", info->byte_count);
+	ceInfo(handle, "Total number of host memory allocations: %d", info->allocations);
+	ceInfo(handle, "Total number of host memory deallocations: %d", info->deallocations);
+	ceInfo(handle, "Maximum number of bytes allocated in host memory: %d", info->max_allocated_bytes);
+	ceInfo(handle, "Number of blocks in host memory still allocated: %d", info->block_count);
+	ceInfo(handle, "Number of bytes in host memory still allocated: %d", info->byte_count);
 
 	block = info->head_block;
     while (block)
@@ -382,11 +405,11 @@ ceLogHostMemoryInfo(
         block = block->next;
     }
 
-	ceInfo(session, "Number of named blocks in host memory: %d", named_block_count);
-	ceInfo(session, "Number of named bytes in host memory: %d", named_byte_count);
+	ceInfo(handle, "Number of named blocks in host memory: %d", named_block_count);
+	ceInfo(handle, "Number of named bytes in host memory: %d", named_byte_count);
 
-	ceInfo(session, "Number of anonymous blocks in host memory: %d", anonymous_block_count);
-	ceInfo(session, "Number of anonymous bytes in host memory: %d", anonymous_byte_count);
+	ceInfo(handle, "Number of anonymous blocks in host memory: %d", anonymous_block_count);
+	ceInfo(handle, "Number of anonymous bytes in host memory: %d", anonymous_byte_count);
 
     block = info->head_block;
     index = 0;
@@ -395,13 +418,14 @@ ceLogHostMemoryInfo(
 
         if (block->filename)
         {
-			ceInfo(session, "block[%08d] : %08d bytes -- file: '%s' line '%04d'", index, block->size, block->filename, block->line);
+			ceInfo(handle, "block[%08d] : %08d bytes -- file: '%s' line '%04d'", index, block->size, block->filename, block->line);
         }
         else
         {
-			ceInfo(session, "block[%08d] : %08d bytes -- file: 'unknown' line 'unknown'", index, block->size, block->filename, block->line);
+			ceInfo(handle, "block[%08d] : %08d bytes -- file: 'unknown' line 'unknown'", index, block->size, block->filename, block->line);
         }
         block = block->next;
         index++;
     }
+	return CE_SUCCESS;
 }

@@ -60,7 +60,8 @@ typedef struct _ce_logging_info_t {
 /**************************************************************************************************/
 
 static cl_bool
-CloseLogFile(ce_logging_info_t* log)
+CloseLogFile(
+	ce_logging_info_t* log)
 {
 	if (log && log->stream)
 	{
@@ -72,7 +73,8 @@ CloseLogFile(ce_logging_info_t* log)
 }
 
 static cl_bool
-OpenLogFile(ce_logging_info_t* log, const char* filename)
+OpenLogFile(
+	ce_logging_info_t* log, const char* filename)
 {
 	static const char *replace = "w";
 	static const char *append = "a+";
@@ -99,7 +101,8 @@ OpenLogFile(ce_logging_info_t* log, const char* filename)
 }
 
 static cl_int
-LogHandler(ce_logging_info_t* log, cl_int level, cl_int status, const char* format, va_list arg_list)
+LogHandler(
+	ce_logging_info_t* log, cl_int level, cl_int status, const char* format, va_list arg_list)
 {
 	static char buffer[4096] = {0};
 	const char *prefix = 0;
@@ -147,7 +150,8 @@ LogHandler(ce_logging_info_t* log, cl_int level, cl_int status, const char* form
 }
 
 static cl_int
-SystemLogHandler(cl_int level, cl_int status, const char* format, va_list arg_list)
+SystemLogHandler(
+	cl_int level, cl_int status, const char* format, va_list arg_list)
 {
 	static char buffer[4096] = {0};
 	const char *prefix = 0;
@@ -155,10 +159,14 @@ SystemLogHandler(cl_int level, cl_int status, const char* format, va_list arg_li
 		
 	switch(level)
 	{
+#if defined(CE_DEBUG_BUILD)
 		case CE_LOG_LEVEL_DEBUG: 	 { prefix = CE_LOG_PREFIX_DEBUG; 		break; }
+#else
+		case CE_LOG_LEVEL_DEBUG: 	 { return CL_SUCCESS; }
+#endif
 		case CE_LOG_LEVEL_INFO: 	 { prefix = CE_LOG_PREFIX_INFO; 		break; }
-		case CE_LOG_LEVEL_WARNING:  { prefix = CE_LOG_PREFIX_WARNING; 	break; }
-		case CE_LOG_LEVEL_CRITICAL: { prefix = CE_LOG_PREFIX_CRITICAL; 	break; }
+		case CE_LOG_LEVEL_WARNING: 	 { prefix = CE_LOG_PREFIX_WARNING; 		break; }
+		case CE_LOG_LEVEL_CRITICAL:  { prefix = CE_LOG_PREFIX_CRITICAL; 	break; }
 		case CE_LOG_LEVEL_ERROR: 	 { prefix = CE_LOG_PREFIX_ERROR; 		break; }
 		default:	 				 { prefix = CE_LOG_PREFIX_INFO; 		break; }
 	};
@@ -172,6 +180,14 @@ SystemLogHandler(cl_int level, cl_int status, const char* format, va_list arg_li
 	}
 	fflush(stderr);
     
+	if(level == CE_LOG_LEVEL_CRITICAL)
+	{
+#if defined(CE_PLATFORM_WINDOWS)
+		__debugbreak();
+#else
+		abort();
+#endif
+	}
     return CL_SUCCESS;
 }
 
@@ -179,7 +195,8 @@ SystemLogHandler(cl_int level, cl_int status, const char* format, va_list arg_li
 /**************************************************************************************************/
 
 cl_int
-ceEnableLogging(ce_session session, cl_bitfield flags, const char* filename)
+ceEnableLogging(
+	ce_session session, cl_bitfield flags, const char* filename)
 {
 	cl_int status;
 	ce_session_t* s = (ce_session_t*)session;
@@ -194,7 +211,8 @@ ceEnableLogging(ce_session session, cl_bitfield flags, const char* filename)
 }
 
 cl_int
-ceDisableLogging(ce_session session)
+ceDisableLogging(
+	ce_session session)
 {
 	ce_session_t* s = (ce_session_t*)session;
 	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
@@ -213,7 +231,8 @@ ceDisableLogging(ce_session session)
 }
 
 cl_int 
-ceSetLoggingMode(ce_session session, cl_bitfield flags, const char* filename)
+ceSetLoggingMode(
+	ce_session session, cl_bitfield flags, const char* filename)
 {
 	ce_session_t* s = (ce_session_t*)session;
 	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
@@ -231,7 +250,8 @@ ceSetLoggingMode(ce_session session, cl_bitfield flags, const char* filename)
 }
 
 cl_int 
-ceDebug(ce_session session, const char* format, ...)
+ceDebug(
+	ce_session session, const char* format, ...)
 {
 	ce_session_t* s = (ce_session_t*)session;
 	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
@@ -252,7 +272,8 @@ ceDebug(ce_session session, const char* format, ...)
 }
 
 cl_int 
-ceInfo(ce_session session, const char* format, ...)
+ceInfo(
+	ce_session session, const char* format, ...)
 {
 	ce_session_t* s = (ce_session_t*)session;
 	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
@@ -273,7 +294,8 @@ ceInfo(ce_session session, const char* format, ...)
 }
 
 cl_int 
-ceWarning(ce_session session, const char* format, ...)
+ceWarning(
+	ce_session session, const char* format, ...)
 {
 	ce_session_t* s = (ce_session_t*)session;
 	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
@@ -294,7 +316,8 @@ ceWarning(ce_session session, const char* format, ...)
 }
 
 cl_int 
-ceCritical(ce_session session, const char* format, ...)
+ceCritical(
+	ce_session session, const char* format, ...)
 {
 	ce_session_t* s = (ce_session_t*)session;
 	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
@@ -315,7 +338,8 @@ ceCritical(ce_session session, const char* format, ...)
 }
 
 cl_int 
-ceError(ce_session session, cl_int error, const char* format, ...)
+ceError(
+	ce_session session, cl_int error, const char* format, ...)
 {
 	ce_session_t* s = (ce_session_t*)session;
 	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
@@ -332,11 +356,12 @@ ceError(ce_session session, cl_int error, const char* format, ...)
 	    status = LogHandler(log, CE_LOG_LEVEL_ERROR, error, format, arg_list);
 	}
     va_end(arg_list);
-    return status;
+	return status;
 }
 
 const char * 
-ceGetErrorString(cl_int status)
+ceGetErrorString(
+	cl_int status)
 {
     const char* error_string = 0;
 

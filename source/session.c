@@ -45,18 +45,18 @@ ceCreateSession(void)
 }
 
 static void 
-ceNotifyCallback(const char *message, const void *opaque, size_t opaque_size, void *user_data)
+ceNotifyCallback(const char *message, const void *handle, size_t handle_size, void *user_data)
 {
 	ce_session s = (ce_session)user_data;
 	
 	ceError(s, CL_INVALID_VALUE, "Notified of unexpected error: %s\n", message);
-	if (opaque_size > 0) 
+	if (handle_size > 0) 
 	{
 		int ii;
-		ceWarning(s, "  %d bytes of vendor data.", opaque_size);
-		for (ii = 0; ii < opaque_size; ii++) 
+		ceWarning(s, "  %d bytes of vendor data.", handle_size);
+		for (ii = 0; ii < handle_size; ii++) 
 		{
-			char c = ((const char *) opaque)[ii];
+			char c = ((const char *) handle)[ii];
 			if (ii % 10 == 0) {
 				ceWarning(s, "\n   %3d:", ii);
 			}

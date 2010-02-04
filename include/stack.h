@@ -48,7 +48,7 @@ CE_EXTERN_C_BEGIN
 extern CE_API_EXPORT ce_stack 
 ceCreateStack(ce_session session);
 
-extern CE_API_EXPORT void 
+extern CE_API_EXPORT ce_status 
 ceReleaseStack(ce_stack stack);
 
 extern CE_API_EXPORT void

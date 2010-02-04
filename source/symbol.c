@@ -37,10 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**************************************************************************************************/
 
 typedef struct _ce_symbol_t {
-	ce_reference				reference;
+	ce_session					session;
 	ce_uint						hash;
 	char* 						name;
-	size_t						length;
+	ce_uint						length;
 } ce_symbol_t;
 
 /**************************************************************************************************/
@@ -57,48 +57,88 @@ HashString(const char *str)
     return hash;
 }
 
+/**************************************************************************************************/
+
 ce_symbol
 ceCreateSymbol(
-	ce_session session, const char* name, size_t length)
+	ce_session session, 
+	const char* name, 
+	size_t length)
 {
 	ce_symbol_t* symbol;
 	symbol = ceAllocate(session, sizeof(ce_symbol_t));
-	symbol->length = length;
-    symbol->hash = HashString(name);
-	symbol->name = ceAllocate(session, sizeof(char) * length + 1);
-    if(symbol->name) snprintf(symbol->name, length, "%s", name);
+	if(!symbol)
+		return NULL;
+
+	memset(symbol, 0, sizeof(ce_symbol_t));
+
+	length++;
+	symbol->name = ceAllocate(session, sizeof(char) * length);
+    if(symbol->name) 
+    {
+	    snprintf(symbol->name, length, "%s", name);
+    	symbol->length = length;
+		symbol->hash = HashString(name);    
+		symbol->session = session;
+
+	    ceDebug(symbol->session, "Created symbol: name='%s' length='%d' hash='%u' session='%p'\n",
+	    		symbol->name, symbol->length, symbol->hash, symbol->session);
+	}
+    
     return (ce_symbol)symbol;
 }
 
-void ceReleaseSymbol(ce_symbol symbol)
+void 
+ceReleaseSymbol(
+	ce_symbol handle)
 {
-	ce_symbol_t* s = (ce_symbol_t*)symbol;
-	if(s->name) 
+	ce_session session = NULL;
+	ce_symbol_t* symbol = (ce_symbol_t*)handle;
+	if(symbol && symbol->name) 
 	{
-		ceDeallocate(NULL, s->name);
-		s->name = NULL;
+		session = symbol->session;
+		ceDeallocate(session, symbol->name);
+		symbol->name = NULL;
 	}
-	ceDeallocate(NULL, s);
-	memset(s, 0, sizeof(ce_symbol_t));
+	ceDeallocate(session, symbol);
+}
+
+ce_bool
+ceIsSymbolNameEqual(
+	ce_symbol a, ce_symbol b)
+{
+	if(!a || !b)
+		return CE_FALSE;
+		
+	return ( ceGetSymbolHash(a) == ceGetSymbolHash(b) );
 }
 
 const char*
-ceGetSymbolName(ce_symbol symbol)
+ceGetSymbolName(
+	ce_symbol handle)
 {
-	ce_symbol_t* s = (ce_symbol_t*)symbol;
-	return s->name;
+	if(handle == NULL) return NULL;
+	ce_symbol_t* symbol = (ce_symbol_t*)handle;
+	return symbol->name;
 }
 
 ce_uint 
-ceGetSymbolHash(ce_symbol symbol)
+ceGetSymbolHash(
+	ce_symbol handle)
 {
-	ce_symbol_t* s = (ce_symbol_t*)symbol;
-	return s->hash;
+	if(handle == NULL) return 0;
+	ce_symbol_t* symbol = (ce_symbol_t*)handle;
+	return symbol->hash;
 }
 
 size_t
-ceGetSymbolLength(ce_symbol symbol)
+ceGetSymbolLength(
+	ce_symbol handle)
 {
-	ce_symbol_t* s = (ce_symbol_t*)symbol;
-	return s->length;
+	if(handle == NULL) return 0;
+	ce_symbol_t* symbol = (ce_symbol_t*)handle;
+	return symbol->length;
 }
+
+/**************************************************************************************************/
+
