@@ -32,64 +32,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_MEMORY_H__
-#define __CE_MEMORY_H__
-
-/**************************************************************************************************/
-
-#include "platform.h"
-#include "types.h"
-#include "values.h"
 #include "status.h"
- 
-/**************************************************************************************************/
-
-CE_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-#define ceAllocate(session, size) 	ceAllocateHostMemory(session, size, __FILE__ , __LINE__)
-#define ceDeallocate(session, ptr) 	ceDeallocateHostMemory(session, ptr)
+const char*
+ceGetStatusString(
+	ce_status value, ce_status *status)
+{
 
-extern CE_API_EXPORT 
-void* ceAllocateHostMemory(ce_session session, size_t bytes, char* filename, unsigned int line);
+	if(status)
+		(*status) = CE_SUCCESS;
 
-extern CE_API_EXPORT ce_status 
-ceDeallocateHostMemory(ce_session session, void* ptr);
+	switch(value)
+	{
+		case CE_SUCCESS:					return "success";
+		case CE_INVALID_TYPE:				return "invalid type";
+		case CE_INVALID_DATA:				return "invalid data";
+		case CE_INVALID_VALUE:				return "invalid value";
+		case CE_INVALID_REFERENCE:			return "invalid reference";
+		case CE_INVALID_SYMBOL:				return "invalid symbol";
+		case CE_INVALID_STACK:				return "invalid stack";
+		case CE_INVALID_QUEUE:				return "invalid queue";
+		case CE_INVALID_MAP:				return "invalid map";
+		case CE_INVALID_LOG:				return "invalid log";
+		case CE_INVALID_SESSION:			return "invalid session";
+		case CE_INVALID_CONTEXT:			return "invalid context";
+		case CE_INVALID_HOST:				return "invalid host";
+		case CE_INVALID_MEMORY_INFO:		return "invalid memory info";
+		case CE_INVALID_LOGGING_INFO:		return "invalid logging info";
+		case CE_INVALID_PROFILING_INFO:		return "invalid profiling info";
+		case CE_OUT_OF_HOST_MEMORY:			return "out of host memory";
+		case CE_TYPE_MISMATCH:				return "type mismatch";
+		case CE_SIZE_MISMATCH:				return "size mismatch";
+		case CE_INVALID_STATUS:				return "invalid status";
+		default:
+		{
+			if(status)
+				(*status) = CE_INVALID_STATUS;
+			
+			return "unknown status";
+		}
+	};
+
+	if(status)
+		(*status) = CE_INVALID_STATUS;
+	
+	return "unknown";
+}
+
+ce_bool
+ceIsError(
+	ce_status value)
+{
+	if(value == CE_SUCCESS)
+		return CE_FALSE;
+	return CE_TRUE;
+}
 
 /**************************************************************************************************/
 
-extern CE_API_EXPORT ce_status
-ceEnableHostMemoryTracking(ce_session session);
-
-extern CE_API_EXPORT ce_status
-ceDisableHostMemoryTracking(ce_session session);
-
-extern CE_API_EXPORT ce_status 
-ceLogHostMemoryInfo(ce_session session);
-
-extern CE_API_EXPORT ce_status
-ceEnableDeviceMemoryTracking(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT ce_status
-ceDisableDeviceMemoryTracking(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT void 
-ceLogDeviceMemoryInfo(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT ce_reference
-ceCreateReference(ce_session, void* ptr);
-
-extern CE_API_EXPORT ce_status
-ceRetain(ce_session session, ce_reference reference);
-
-extern CE_API_EXPORT ce_status
-ceRelease(ce_session session, ce_reference reference);
-
-/**************************************************************************************************/
-
-CE_EXTERN_C_END
-
-/**************************************************************************************************/
-
-#endif /* __CE_MEMORY_H__ */

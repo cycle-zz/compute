@@ -59,6 +59,7 @@ typedef struct _ce_session_t {
 	ce_session_memory_info									memory;
 	ce_profiling_info										profiling;
 	ce_logging_info											logging;
+	ce_bool													valid;
 } ce_session_t;
 
 
@@ -69,6 +70,9 @@ ceCreateSessionForHost(void);
 
 extern CE_API_EXPORT ce_session
 ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count);
+
+extern CE_API_EXPORT ce_status
+ceReleaseSession(ce_session session);
 
 extern CE_API_EXPORT cl_bool
 ceIsValidSession(ce_session session);

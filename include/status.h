@@ -32,59 +32,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_MEMORY_H__
-#define __CE_MEMORY_H__
+#ifndef __CE_STATUS_H__
+#define __CE_STATUS_H__
 
 /**************************************************************************************************/
 
 #include "platform.h"
 #include "types.h"
-#include "values.h"
-#include "status.h"
- 
+
 /**************************************************************************************************/
 
 CE_EXTERN_C_BEGIN
 
-/**************************************************************************************************/
+/* Status Enumerations ****************************************************************************/
 
-#define ceAllocate(session, size) 	ceAllocateHostMemory(session, size, __FILE__ , __LINE__)
-#define ceDeallocate(session, ptr) 	ceDeallocateHostMemory(session, ptr)
+typedef enum _ce_status {
+	CE_SUCCESS,
+	CE_INVALID_TYPE,
+	CE_INVALID_DATA,
+	CE_INVALID_VALUE,
+	CE_INVALID_REFERENCE,
+	CE_INVALID_SYMBOL,
+	CE_INVALID_STACK,
+	CE_INVALID_QUEUE,
+	CE_INVALID_MAP,
+	CE_INVALID_LOG,
+	CE_INVALID_SESSION,
+	CE_INVALID_CONTEXT,
+	CE_INVALID_HOST,
+	CE_INVALID_MEMORY_INFO,
+	CE_INVALID_LOGGING_INFO,
+	CE_INVALID_PROFILING_INFO,
+	CE_OUT_OF_HOST_MEMORY,
+	CE_TYPE_MISMATCH,
+	CE_SIZE_MISMATCH,
+	CE_INVALID_STATUS,
+} ce_status;
 
-extern CE_API_EXPORT 
-void* ceAllocateHostMemory(ce_session session, size_t bytes, char* filename, unsigned int line);
+/* Status Methods *********************************************************************************/
 
-extern CE_API_EXPORT ce_status 
-ceDeallocateHostMemory(ce_session session, void* ptr);
+extern CE_API_EXPORT const char*
+ceGetStatusString(ce_status value, ce_status* status);
 
-/**************************************************************************************************/
-
-extern CE_API_EXPORT ce_status
-ceEnableHostMemoryTracking(ce_session session);
-
-extern CE_API_EXPORT ce_status
-ceDisableHostMemoryTracking(ce_session session);
-
-extern CE_API_EXPORT ce_status 
-ceLogHostMemoryInfo(ce_session session);
-
-extern CE_API_EXPORT ce_status
-ceEnableDeviceMemoryTracking(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT ce_status
-ceDisableDeviceMemoryTracking(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT void 
-ceLogDeviceMemoryInfo(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT ce_reference
-ceCreateReference(ce_session, void* ptr);
-
-extern CE_API_EXPORT ce_status
-ceRetain(ce_session session, ce_reference reference);
-
-extern CE_API_EXPORT ce_status
-ceRelease(ce_session session, ce_reference reference);
+extern CE_API_EXPORT ce_bool
+ceIsError(ce_status value);
 
 /**************************************************************************************************/
 
@@ -92,4 +83,5 @@ CE_EXTERN_C_END
 
 /**************************************************************************************************/
 
-#endif /* __CE_MEMORY_H__ */
+#endif /* __CE_STATUS_H__ */
+

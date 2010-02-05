@@ -37,11 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**************************************************************************************************/
 
 #define CE_LOG_LEVEL_DEBUG					(1)
-#define CE_LOG_LEVEL_INFO					(2)
-#define CE_LOG_LEVEL_WARNING				(3)
-#define CE_LOG_LEVEL_CRITICAL				(4)
-#define CE_LOG_LEVEL_ERROR					(5)
+#define CE_LOG_LEVEL_TEST					(2)
+#define CE_LOG_LEVEL_INFO					(3)
+#define CE_LOG_LEVEL_WARNING				(4)
+#define CE_LOG_LEVEL_CRITICAL				(5)
+#define CE_LOG_LEVEL_ERROR					(6)
 
+#define CE_LOG_PREFIX_TEST					"[test]"
 #define CE_LOG_PREFIX_DEBUG					"[debug]"
 #define CE_LOG_PREFIX_INFO					"[info]"
 #define CE_LOG_PREFIX_WARNING				"[warning]"
@@ -111,9 +113,10 @@ LogHandler(
 	switch(level)
 	{
 		case CE_LOG_LEVEL_DEBUG: 	 { prefix = CE_LOG_PREFIX_DEBUG; 		break; }
+		case CE_LOG_LEVEL_TEST: 	 { prefix = CE_LOG_PREFIX_TEST; 		break; }
 		case CE_LOG_LEVEL_INFO: 	 { prefix = CE_LOG_PREFIX_INFO; 		break; }
-		case CE_LOG_LEVEL_WARNING:  { prefix = CE_LOG_PREFIX_WARNING; 	break; }
-		case CE_LOG_LEVEL_CRITICAL: { prefix = CE_LOG_PREFIX_CRITICAL; 	break; }
+		case CE_LOG_LEVEL_WARNING:   { prefix = CE_LOG_PREFIX_WARNING; 		break; }
+		case CE_LOG_LEVEL_CRITICAL:  { prefix = CE_LOG_PREFIX_CRITICAL; 	break; }
 		case CE_LOG_LEVEL_ERROR: 	 { prefix = CE_LOG_PREFIX_ERROR; 		break; }
 		default:	 				 { prefix = CE_LOG_PREFIX_INFO; 		break; }
 	};
@@ -159,11 +162,12 @@ SystemLogHandler(
 		
 	switch(level)
 	{
-#if 0 // defined(CE_DEBUG_BUILD)
+#if defined(CE_DEBUG_BUILD)
 		case CE_LOG_LEVEL_DEBUG: 	 { prefix = CE_LOG_PREFIX_DEBUG; 		break; }
 #else
 		case CE_LOG_LEVEL_DEBUG: 	 { return CL_SUCCESS; }
 #endif
+		case CE_LOG_LEVEL_TEST: 	 { prefix = CE_LOG_PREFIX_TEST; 		break; }
 		case CE_LOG_LEVEL_INFO: 	 { prefix = CE_LOG_PREFIX_INFO; 		break; }
 		case CE_LOG_LEVEL_WARNING: 	 { prefix = CE_LOG_PREFIX_WARNING; 		break; }
 		case CE_LOG_LEVEL_CRITICAL:  { prefix = CE_LOG_PREFIX_CRITICAL; 	break; }
@@ -266,6 +270,28 @@ ceDebug(
 	else
 	{
 	    status = LogHandler(log, CE_LOG_LEVEL_DEBUG, 0, format, arg_list);
+    }
+    va_end(arg_list);
+    return status;
+}
+
+cl_int 
+ceTest(
+	ce_session session, const char* format, ...)
+{
+	ce_session_t* s = (ce_session_t*)session;
+	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
+
+    cl_int status;
+    va_list arg_list;
+    va_start(arg_list, format);
+	if(s == NULL || log == NULL)
+	{
+	    status = SystemLogHandler(CE_LOG_LEVEL_TEST, 0, format, arg_list);
+	}
+	else
+	{
+	    status = LogHandler(log, CE_LOG_LEVEL_TEST, 0, format, arg_list);
     }
     va_end(arg_list);
     return status;

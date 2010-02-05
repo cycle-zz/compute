@@ -51,6 +51,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if (defined(__i386__) || defined(__amd64__))
 	#define CE_ARCH_X86		(1)
+	#if defined(__amd64__)
+		#define CE_64BIT	(1)
+	#else
+		#define CE_32BIT	(1)
+	#endif
 #endif
 
 /* C Declaration **********************************************************************************/

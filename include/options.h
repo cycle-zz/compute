@@ -37,8 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-#include "compute.h"
- 
+#include "platform.h"
+#include "types.h"
+#include "status.h"
+#include "values.h"
+
 /**************************************************************************************************/
 
 CE_EXTERN_C_BEGIN

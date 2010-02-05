@@ -35,8 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __CE_MAP_H__
 #define __CE_MAP_H__
 
-#include "compute.h"
+/**************************************************************************************************/
 
+#include "platform.h"
+#include "types.h"
+#include "values.h"
+#include "status.h"
+ 
 /**************************************************************************************************/
 
 CE_EXTERN_C_BEGIN

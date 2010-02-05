@@ -32,64 +32,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_MEMORY_H__
-#define __CE_MEMORY_H__
-
-/**************************************************************************************************/
-
-#include "platform.h"
-#include "types.h"
-#include "values.h"
+#include "device.h"
 #include "status.h"
- 
-/**************************************************************************************************/
-
-CE_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-#define ceAllocate(session, size) 	ceAllocateHostMemory(session, size, __FILE__ , __LINE__)
-#define ceDeallocate(session, ptr) 	ceDeallocateHostMemory(session, ptr)
+const char*
+ceGetDeviceTypeString(
+	ce_device_type type, ce_uint* status)
+{
+	if(status)
+		(*status) = CE_SUCCESS;
+	
+	switch(type)
+	{
+		case CL_DEVICE_TYPE_DEFAULT:		return "default";
+		case CL_DEVICE_TYPE_ALL:			return "all";
+		case CL_DEVICE_TYPE_GPU:			return "gpu";
+		case CL_DEVICE_TYPE_CPU:			return "cpu";
+		case CL_DEVICE_TYPE_ACCELERATOR:	return "accelerator";
+		default:
+		{
+			if(status)
+				(*status) = CE_INVALID_TYPE;
+		
+			return "unknown device type";
+		}
+	};
 
-extern CE_API_EXPORT 
-void* ceAllocateHostMemory(ce_session session, size_t bytes, char* filename, unsigned int line);
-
-extern CE_API_EXPORT ce_status 
-ceDeallocateHostMemory(ce_session session, void* ptr);
-
-/**************************************************************************************************/
-
-extern CE_API_EXPORT ce_status
-ceEnableHostMemoryTracking(ce_session session);
-
-extern CE_API_EXPORT ce_status
-ceDisableHostMemoryTracking(ce_session session);
-
-extern CE_API_EXPORT ce_status 
-ceLogHostMemoryInfo(ce_session session);
-
-extern CE_API_EXPORT ce_status
-ceEnableDeviceMemoryTracking(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT ce_status
-ceDisableDeviceMemoryTracking(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT void 
-ceLogDeviceMemoryInfo(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT ce_reference
-ceCreateReference(ce_session, void* ptr);
-
-extern CE_API_EXPORT ce_status
-ceRetain(ce_session session, ce_reference reference);
-
-extern CE_API_EXPORT ce_status
-ceRelease(ce_session session, ce_reference reference);
+	if(status)
+		(*status) = CE_INVALID_TYPE;
+	
+	return "unknown device type";
+}
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
-
-/**************************************************************************************************/
-
-#endif /* __CE_MEMORY_H__ */

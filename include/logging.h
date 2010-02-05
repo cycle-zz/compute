@@ -66,6 +66,9 @@ extern CE_API_EXPORT cl_int
 ceSetLoggingMode(ce_session session, cl_bitfield flags,  const char* filename);
 
 extern CE_API_EXPORT cl_int 
+ceTest(ce_session session, const char* format, ...);
+
+extern CE_API_EXPORT cl_int 
 ceDebug(ce_session session, const char* format, ...);
 
 extern CE_API_EXPORT cl_int 

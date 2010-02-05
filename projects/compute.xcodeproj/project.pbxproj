@@ -33,6 +33,11 @@
 		C3AE4AF9111BAF06000AE6F6 /* values.h in Headers */ = {isa = PBXBuildFile; fileRef = C3AE4AF8111BAF06000AE6F6 /* values.h */; };
 		C3AE4B0A111BAFC6000AE6F6 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = C3AE4B09111BAFC6000AE6F6 /* main.c */; };
 		C3AE4B14111BB067000AE6F6 /* libcompute.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC0630554660B00DB518D /* libcompute.dylib */; };
+		C3BA2B34111BCBA50011F3F7 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = C3BA2B33111BCBA50011F3F7 /* main.c */; };
+		C3BA2B43111BCBCD0011F3F7 /* status.h in Headers */ = {isa = PBXBuildFile; fileRef = C3BA2B42111BCBCD0011F3F7 /* status.h */; };
+		C3BA2B45111BCBE40011F3F7 /* device.h in Headers */ = {isa = PBXBuildFile; fileRef = C3BA2B44111BCBE40011F3F7 /* device.h */; };
+		C3BA2B48111BCBF20011F3F7 /* device.c in Sources */ = {isa = PBXBuildFile; fileRef = C3BA2B46111BCBF20011F3F7 /* device.c */; };
+		C3BA2B49111BCBF20011F3F7 /* status.c in Sources */ = {isa = PBXBuildFile; fileRef = C3BA2B47111BCBF20011F3F7 /* status.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +67,12 @@
 		C3AE4AF8111BAF06000AE6F6 /* values.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = values.h; sourceTree = "<group>"; };
 		C3AE4B05111BAFA8000AE6F6 /* options */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = options; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3AE4B09111BAFC6000AE6F6 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../tests/options/main.c; sourceTree = SOURCE_ROOT; };
+		C3BA2B2F111BCB8F0011F3F7 /* session */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = session; path = ../../../../build/Debug/session; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3BA2B33111BCBA50011F3F7 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../tests/session/main.c; sourceTree = SOURCE_ROOT; };
+		C3BA2B42111BCBCD0011F3F7 /* status.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = status.h; sourceTree = "<group>"; };
+		C3BA2B44111BCBE40011F3F7 /* device.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = device.h; sourceTree = "<group>"; };
+		C3BA2B46111BCBF20011F3F7 /* device.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = device.c; path = ../source/device.c; sourceTree = SOURCE_ROOT; };
+		C3BA2B47111BCBF20011F3F7 /* status.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = status.c; path = ../source/status.c; sourceTree = SOURCE_ROOT; };
 		D2AAC0630554660B00DB518D /* libcompute.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libcompute.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -71,6 +82,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				C3AE4B14111BB067000AE6F6 /* libcompute.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3BA2B2D111BCB8F0011F3F7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,10 +106,10 @@
 		08FB7794FE84155DC02AAC07 /* compute */ = {
 			isa = PBXGroup;
 			children = (
-				C3AE4B0C111BAFD3000AE6F6 /* Tests */,
 				C32A849711145B63004AD8CC /* Frameworks */,
 				C32A846711145A6A004AD8CC /* Headers */,
 				08FB7795FE84155DC02AAC07 /* Source */,
+				C3AE4B0C111BAFD3000AE6F6 /* Tests */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 			);
 			name = compute;
@@ -100,6 +118,8 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				C3BA2B46111BCBF20011F3F7 /* device.c */,
+				C3BA2B47111BCBF20011F3F7 /* status.c */,
 				C3AE4AF4111BAEFB000AE6F6 /* types.c */,
 				C3AE4AF5111BAEFB000AE6F6 /* values.c */,
 				C3AE4A87111AAA9C000AE6F6 /* options.c */,
@@ -119,6 +139,7 @@
 			children = (
 				D2AAC0630554660B00DB518D /* libcompute.dylib */,
 				C3AE4B05111BAFA8000AE6F6 /* options */,
+				C3BA2B2F111BCB8F0011F3F7 /* session */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -126,6 +147,8 @@
 		C32A846711145A6A004AD8CC /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				C3BA2B44111BCBE40011F3F7 /* device.h */,
+				C3BA2B42111BCBCD0011F3F7 /* status.h */,
 				C3AE4AF8111BAF06000AE6F6 /* values.h */,
 				C3AE4A8B111AAAA9000AE6F6 /* atomics.h */,
 				C3AE4A8C111AAAA9000AE6F6 /* options.h */,
@@ -155,6 +178,7 @@
 		C3AE4B0C111BAFD3000AE6F6 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C3BA2B29111BCB6D0011F3F7 /* session */,
 				C3AE4B0D111BAFD9000AE6F6 /* options */,
 			);
 			name = Tests;
@@ -166,6 +190,14 @@
 				C3AE4B09111BAFC6000AE6F6 /* main.c */,
 			);
 			name = options;
+			sourceTree = "<group>";
+		};
+		C3BA2B29111BCB6D0011F3F7 /* session */ = {
+			isa = PBXGroup;
+			children = (
+				C3BA2B33111BCBA50011F3F7 /* main.c */,
+			);
+			name = session;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -188,6 +220,8 @@
 				C3AE4A91111AAAA9000AE6F6 /* stack.h in Headers */,
 				C3AE4A92111AAAA9000AE6F6 /* types.h in Headers */,
 				C3AE4AF9111BAF06000AE6F6 /* values.h in Headers */,
+				C3BA2B43111BCBCD0011F3F7 /* status.h in Headers */,
+				C3BA2B45111BCBE40011F3F7 /* device.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,6 +242,22 @@
 			name = options;
 			productName = options;
 			productReference = C3AE4B05111BAFA8000AE6F6 /* options */;
+			productType = "com.apple.product-type.tool";
+		};
+		C3BA2B2E111BCB8F0011F3F7 /* session */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C3BA2B35111BCBA50011F3F7 /* Build configuration list for PBXNativeTarget "session" */;
+			buildPhases = (
+				C3BA2B2C111BCB8F0011F3F7 /* Sources */,
+				C3BA2B2D111BCB8F0011F3F7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = session;
+			productName = session;
+			productReference = C3BA2B2F111BCB8F0011F3F7 /* session */;
 			productType = "com.apple.product-type.tool";
 		};
 		D2AAC0620554660B00DB518D /* compute */ = {
@@ -241,6 +291,7 @@
 			targets = (
 				D2AAC0620554660B00DB518D /* compute */,
 				C3AE4B04111BAFA8000AE6F6 /* options */,
+				C3BA2B2E111BCB8F0011F3F7 /* session */,
 			);
 		};
 /* End PBXProject section */
@@ -251,6 +302,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				C3AE4B0A111BAFC6000AE6F6 /* main.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3BA2B2C111BCB8F0011F3F7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C3BA2B34111BCBA50011F3F7 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,6 +327,8 @@
 				C3AE4A8A111AAA9C000AE6F6 /* stack.c in Sources */,
 				C3AE4AF6111BAEFB000AE6F6 /* types.c in Sources */,
 				C3AE4AF7111BAEFB000AE6F6 /* values.c in Sources */,
+				C3BA2B48111BCBF20011F3F7 /* device.c in Sources */,
+				C3BA2B49111BCBF20011F3F7 /* status.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -366,6 +427,36 @@
 			};
 			name = Release;
 		};
+		C3BA2B31111BCB900011F3F7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = session;
+			};
+			name = Debug;
+		};
+		C3BA2B32111BCB900011F3F7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = session;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -392,6 +483,15 @@
 			buildConfigurations = (
 				C3AE4B07111BAFA8000AE6F6 /* Debug */,
 				C3AE4B08111BAFA8000AE6F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C3BA2B35111BCBA50011F3F7 /* Build configuration list for PBXNativeTarget "session" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3BA2B31111BCB900011F3F7 /* Debug */,
+				C3BA2B32111BCB900011F3F7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

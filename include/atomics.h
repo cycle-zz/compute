@@ -35,7 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __CE_ATOMICS_H__
 #define __CE_ATOMICS_H__
 
-#include "compute.h"
+/**************************************************************************************************/
+
+#include "platform.h"
+#include "types.h"
+#include "status.h"
 
 /**************************************************************************************************/
 

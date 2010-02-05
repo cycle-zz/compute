@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __CE_TYPES_H__
 #define __CE_TYPES_H__
 
+/**************************************************************************************************/
+
 #include "platform.h"
 
 /**************************************************************************************************/
@@ -148,6 +150,7 @@ typedef struct _ce_session_memory_info* 	ce_session_memory_info;
 typedef struct _ce_memory_info*  		 	ce_memory_info;
 typedef struct _ce_logging_info*  		 	ce_logging_info;
 typedef struct _ce_profiling_info*    	 	ce_profiling_info;
+typedef ce_uint 							ce_device_type;
 
 /* Type Enumerations *******************************************************************************/
 
@@ -180,39 +183,10 @@ typedef enum _ce_type {
 	CE_TYPE_UNKNOWN
 } ce_type;
 
-/* Status Enumerations ****************************************************************************/
-
-typedef enum _ce_status {
-	CE_SUCCESS,
-	CE_INVALID_TYPE,
-	CE_INVALID_DATA,
-	CE_INVALID_VALUE,
-	CE_INVALID_REFERENCE,
-	CE_INVALID_SYMBOL,
-	CE_INVALID_STACK,
-	CE_INVALID_QUEUE,
-	CE_INVALID_MAP,
-	CE_INVALID_LOG,
-	CE_INVALID_SESSION,
-	CE_INVALID_CONTEXT,
-	CE_INVALID_HOST,
-	CE_INVALID_MEMORY_INFO,
-	CE_INVALID_LOGGING_INFO,
-	CE_INVALID_PROFILING_INFO,
-	CE_OUT_OF_HOST_MEMORY,
-	CE_TYPE_MISMATCH,
-	CE_SIZE_MISMATCH,
-	CE_INVALID_STATUS,
-} ce_status;
-	
-
-/**************************************************************************************************/
+/* Type Methods ***********************************************************************************/
 
 extern CE_API_EXPORT const char*
-ceGetTypeString(ce_type value, ce_status* status);
-
-extern CE_API_EXPORT const char*
-ceGetStatusString(ce_status value, ce_status* status);
+ceGetTypeString(ce_type value, ce_uint* status);
 
 /**************************************************************************************************/
 

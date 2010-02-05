@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "memory.h"
 #include "atomics.h"
+#include "session.h"
 
 /**************************************************************************************************/
 

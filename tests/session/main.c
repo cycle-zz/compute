@@ -1,5 +1,41 @@
 #include "compute.h"
 
+ce_status
+TestSessionForHost(void)
+{
+	ceTest(NULL, "Testing session for host...\n");
+	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+
+	ce_session session = ceCreateSessionForHost();
+	if(ceIsValidSession(session))
+	{
+		ceReleaseSession(session);
+		ceTest(NULL, "PASSED!\n");
+		return CE_SUCCESS;
+	}
+
+	ceTest(NULL, "FAILED!\n");
+	return CE_INVALID_SESSION;
+}
+
+ce_status
+TestSessionForDeviceType(ce_uint type)
+{
+	ce_status status;
+	ceTest(NULL, "Testing session for device type '%s'...\n", ceGetDeviceTypeString(type, &status));
+	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+
+	ce_session session = ceCreateSessionForDeviceType(type, 0);
+	if(ceIsValidSession(session))
+	{
+		ceReleaseSession(session);
+		ceTest(NULL, "PASSED!\n");
+		return CE_SUCCESS;
+	}
+	
+	ceTest(NULL, "FAILED!\n");
+	return CE_INVALID_SESSION;
+}
 
 int
 main(int argc, char *argv[])
@@ -7,24 +43,19 @@ main(int argc, char *argv[])
 	char *progname;
 	progname = argv[0];
 		  
-  	ce_option options[] = {
-  		{ "bool", 		CE_TYPE_BOOL, 	{ 0 } },
-  		{ "char", 		CE_TYPE_CHAR, 	{ 0 } },
-  		{ "uchar", 		CE_TYPE_UCHAR, 	{ 0 } },
-  		{ "short", 		CE_TYPE_SHORT,  { 0 } },
-  		{ "ushort", 	CE_TYPE_USHORT, { 0 } },
-  		{ "int", 		CE_TYPE_INT, 	{ 0 } },
-  		{ "uint", 		CE_TYPE_UINT, 	{ 0 } },
-  		{ "long", 		CE_TYPE_LONG, 	{ 0 } },
-  		{ "ulong", 		CE_TYPE_ULONG, 	{ 0 } },
-  		{ "float", 		CE_TYPE_FLOAT, 	{ 0 } },
-  		{ "double", 	CE_TYPE_DOUBLE, { 0 } },
-  		{ "symbol", 	CE_TYPE_SYMBOL, { 0 } },
-  		{ 0, 0, { 0 }  },
-  	};
-  	ce_uint expected = sizeof(options) / sizeof(ce_option) - 1;
-  	
-  	ceParseCommandLineOptions(CE_DEFAULT_SESSION, expected, options, argc, argv);
+	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	
+	ceAssert(TestSessionForHost() == CE_SUCCESS);
+	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	
+	ceAssert(TestSessionForDeviceType(CL_DEVICE_TYPE_ALL) == CE_SUCCESS);
+	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	
+	ceAssert(TestSessionForDeviceType(CL_DEVICE_TYPE_GPU) == CE_SUCCESS);
+	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	
+	ceAssert(TestSessionForDeviceType(CL_DEVICE_TYPE_CPU) == CE_SUCCESS);
+	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
   	
 	return 0;
 }

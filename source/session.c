@@ -36,16 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-static ce_session
-ceCreateSession(void)
-{
-	ce_session_t* session = ceAllocate(NULL, sizeof(ce_session_t));
-	memset(session, 0, sizeof(ce_session_t));
-	return (ce_session)session;
-}
-
 static void 
-ceNotifyCallback(const char *message, const void *handle, size_t handle_size, void *user_data)
+NotifyCallback(
+	const char *message, const void *handle, size_t handle_size, void *user_data)
 {
 	ce_session s = (ce_session)user_data;
 	
@@ -66,31 +59,37 @@ ceNotifyCallback(const char *message, const void *handle, size_t handle_size, vo
 	}
 }
 
-cl_bool
-ceIsValidSession(ce_session session)
+/**************************************************************************************************/
+
+static ce_session
+ceCreateSession(void)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	if(!s)
-		return CL_FALSE;
-
-	if(!s->context)
-		return CL_FALSE;
-		
-	if(s->units < 1)
-		return CL_FALSE;
-
-	return CL_TRUE;
+	ce_session_t* session = ceAllocate(NULL, sizeof(ce_session_t));
+	memset(session, 0, sizeof(ce_session_t));
+	return (ce_session)session;
 }
 
 cl_bool
-ceIsValidDeviceIndexForSession(ce_session session, cl_uint device_index)
+ceIsValidSession(
+	ce_session handle)
 {
-	ce_session_t* s = (ce_session_t*)session;
+	ce_session_t* session = (ce_session_t*)handle;
+	if(session && session->valid)
+		return CL_TRUE;
 
-	if(!ceIsValidSession(session))
+	return CL_FALSE;
+}
+
+cl_bool
+ceIsValidDeviceIndexForSession(
+	ce_session handle, cl_uint device_index)
+{
+	ce_session_t* session = (ce_session_t*)handle;
+
+	if(!ceIsValidSession(handle))
 		return CL_FALSE;
 
-	if(device_index >= s->units)
+	if(device_index >= session->units)
 		return CL_FALSE;
 
 	return CL_TRUE;
@@ -99,11 +98,19 @@ ceIsValidDeviceIndexForSession(ce_session session, cl_uint device_index)
 ce_session
 ceCreateSessionForHost(void)
 {
-	return ceCreateSession();
+	ce_session handle = ceCreateSession();
+	ce_session_t* session = (ce_session_t*)handle;
+	if(session)
+		session->valid = CE_TRUE;
+
+    ceInfo(handle, "Adding host to compute session.\n");
+
+	return (ce_session)session;
 }
 
 ce_session
-ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count)
+ceCreateSessionForDeviceType(
+	cl_device_type device_type, cl_uint device_count)
 {
     cl_int status = 0;
 	cl_uint system_device_count = 0;
@@ -112,7 +119,8 @@ ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count)
 	cl_platform_id platform = 0;
     size_t return_size = 0;
     ce_session_t *session = 0;
-
+	ce_session handle = 0;
+	
 	status = clGetPlatformIDs(1, &platform, &system_platform_count); 
 	if (status != CL_SUCCESS || system_platform_count < 1)
 	{
@@ -127,7 +135,11 @@ ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count)
 		return NULL;
 	}
 	
-	device_count = system_device_count > device_count ? device_count : system_device_count;
+	if(device_count)
+		device_count = system_device_count > device_count ? device_count : system_device_count;
+	else
+		device_count = system_device_count;
+	
 	device_list = ceAllocate(NULL, sizeof(cl_device_id) * device_count);
 	memset(device_list, 0, sizeof(cl_device_id) * device_count);
 	
@@ -139,10 +151,12 @@ ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count)
 	}
 
 	session = (ce_session_t*)ceCreateSession();
-	session->context = clCreateContext(NULL, device_count, device_list, ceNotifyCallback, session, &status);
+	handle = (ce_session)session;
+	
+	session->context = clCreateContext(NULL, device_count, device_list, NotifyCallback, session, &status);
     if (!session->context)
     {
-        ceError(NULL, status, "Failed to create compute context!\n");
+        ceError(handle, status, "Failed to create compute context!\n");
         return NULL;
     }
 
@@ -150,16 +164,16 @@ ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count)
     status = clGetContextInfo(session->context, CL_CONTEXT_DEVICES, sizeof(cl_device_id) * device_count, device_list, &return_size);
     if(status != CL_SUCCESS || return_size < 1)
     {
-        ceError(NULL, status, "Failed to retrieve compute devices for context!\n");
+        ceError(handle, status, "Failed to retrieve compute devices for context!\n");
         return NULL;
     }
     
     session->devices = device_list;
     session->units = device_count;
-    session->queues = ceAllocate((ce_session)session, sizeof(cl_command_queue) * session->units);
-    if(session->queues)
+    session->queues = ceAllocate(handle, sizeof(cl_command_queue) * session->units);
+    if(!session->queues)
     {
-        ceError(NULL, status, "Failed to allocate device ids!\n");
+        ceError(handle, status, "Failed to allocate command queues!\n");
         return NULL;
     }
 
@@ -176,69 +190,71 @@ ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count)
             return CL_FALSE;
         }
 
-        ceInfo(NULL, "Creating command queue for '%s' '%s'...\n", vendor_name, device_name);
+        ceInfo(handle, "Adding device '%s' '%s' to compute session.\n", vendor_name, device_name);
 
         session->queues[i] = clCreateCommandQueue(session->context, session->devices[i], 0, &status);
-        if (!session->queues[i] || status)
+        if (!session->queues[i])
         {
-            ceError(NULL, status, "Failed to create a command queue!\n");
+            ceError(handle, status, "Failed to create a command queue!\n");
             return CL_FALSE;
         }
     }
 
-	session->programs = ceCreateMap((ce_session)session, CE_DEFAULT_MAP_SIZE);
-	session->kernels = ceCreateMap((ce_session)session, CE_DEFAULT_MAP_SIZE);
-	session->mem = ceCreateMap((ce_session)session, CE_DEFAULT_MAP_SIZE);
+	session->programs = ceCreateMap(handle, CE_DEFAULT_MAP_SIZE);
+	session->kernels = ceCreateMap(handle, CE_DEFAULT_MAP_SIZE);
+	session->mem = ceCreateMap(handle, CE_DEFAULT_MAP_SIZE);
+	session->valid = CE_TRUE;
 
-    return (ce_session)session;
+    return handle;
 }
 
-void
-ceReleaseSession(ce_session session)
+ce_status
+ceReleaseSession(
+	ce_session handle)
 {
-	ce_session_t* s = (ce_session_t*)session;
+	ce_session_t* session = (ce_session_t*)handle;
 
-	if(!ceIsValidSession(session))
-		return;
+	if(!ceIsValidSession(handle))
+		return CE_INVALID_SESSION;
 
     cl_uint i;
-    if(s->context)
+    if(session->context)
     {
-        for(i = 0; i < s->units; i++)
-            clFinish(s->queues[i]);
+        for(i = 0; i < session->units; i++)
+            clFinish(session->queues[i]);
     }
 
-	if(s->mem) 
-		ceReleaseMap(s->mem);
+	if(session->mem) 
+		ceReleaseMap(session->mem);
 
-	if(s->kernels)
-	    ceReleaseMap(s->kernels);
+	if(session->kernels)
+	    ceReleaseMap(session->kernels);
     
-    if(s->programs)
-	    ceReleaseMap(s->programs);
+    if(session->programs)
+	    ceReleaseMap(session->programs);
 
-    if(s->queues)
+    if(session->queues)
     {
-        for(i = 0; i < s->units; i++)
-            clReleaseCommandQueue(s->queues[i]);
+        for(i = 0; i < session->units; i++)
+            clReleaseCommandQueue(session->queues[i]);
 
-        ceDeallocate(session, s->queues);
-        s->queues = 0;
+        ceDeallocate(handle, session->queues);
+        session->queues = 0;
     }
 
-    if(s->devices)
+    if(session->devices)
     {
-        ceDeallocate(session, s->devices);
-        s->devices = 0;
+        ceDeallocate(handle, session->devices);
+        session->devices = 0;
     }
 
-    if(s->context)
+    if(session->context)
     {
-        clReleaseContext(s->context);
-        s->context = 0;
+        clReleaseContext(session->context);
+        session->context = 0;
     }
 
-    s->units = 0;
-    ceDeallocate(NULL, s);
-    return;
+    session->units = 0;
+    ceDeallocate(handle, session);
+    return CE_SUCCESS;
 }

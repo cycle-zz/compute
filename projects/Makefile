@@ -189,7 +189,7 @@ clobber: clean
 clean: 
 	@echo "Cleaning..."
 	@$(RM) -f $(BUILD_DIR)/*/*.o
-	@$(RM) -f $(TST_DIR)/*/*/*.o
+	@$(RM) -f $(TST_DIR)/*/*.o
 	@$(RM) -f $(LIB_DIR)/*/*/*.*
 	@$(RM) -f $(BIN_DIR)/*/*/*/*
 
@@ -197,14 +197,22 @@ clean:
 	@echo The target \"$@\" does not exist in this Makefile.	
 
 # Test Rules #######################################################################################
-
-tests: $(LIB_FILE) $(TST_BIN_DIR) $(TST_BIN_DIR)/options
+ 
+tests: $(LIB_FILE) $(TST_BIN_DIR) $(TST_BIN_DIR)/options $(TST_BIN_DIR)/session
 
 $(TST_BIN_DIR)/options: $(TST_DIR)/options/main.o
 	@echo "Linking $@"
 	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LDFLAGS) $(LIBPATH) $(LIBRARIES) $(LIB_FILE) $(LIBS) 
 
 $(TST_DIR)/options/main.o: $(TST_DIR)/options/main.c
+	@echo "Building object '$@'"
+	@$(CC) $(CFLAGS) -o $@ -c $<
+
+$(TST_BIN_DIR)/session: $(TST_DIR)/session/main.o
+	@echo "Linking $@"
+	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LDFLAGS) $(LIBPATH) $(LIBRARIES) $(LIB_FILE) $(LIBS) 
+
+$(TST_DIR)/session/main.o: $(TST_DIR)/session/main.c
 	@echo "Building object '$@'"
 	@$(CC) $(CFLAGS) -o $@ -c $<
 
