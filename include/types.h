@@ -209,10 +209,10 @@ typedef enum _ce_status {
 /**************************************************************************************************/
 
 extern CE_API_EXPORT const char*
-ceGetTypeString(ce_type);
+ceGetTypeString(ce_type value, ce_status* status);
 
 extern CE_API_EXPORT const char*
-ceGetStatusString(ce_status);
+ceGetStatusString(ce_status value, ce_status* status);
 
 /**************************************************************************************************/
 

@@ -48,6 +48,9 @@ CE_EXTERN_C_BEGIN
 extern CE_API_EXPORT ce_symbol
 ceCreateSymbol(ce_session session, const char* name, size_t length);
 
+extern CE_API_EXPORT ce_symbol
+ceCreateSymbolFromValue(ce_session session, ce_value handle, ce_status* status);
+
 extern CE_API_EXPORT void 
 ceReleaseSymbol(ce_symbol symbol);
 

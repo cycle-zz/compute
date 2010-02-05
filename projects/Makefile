@@ -1,6 +1,6 @@
 # Project ##########################################################################################
 
-PROJECT_NAME	:= ce
+PROJECT_NAME	:= compute
 BASE_DIR		:= ..
 BIN_DIR 		:= $(BASE_DIR)/bin
 LIB_DIR 		:= $(BASE_DIR)/lib
@@ -202,7 +202,7 @@ tests: $(LIB_FILE) $(TST_BIN_DIR) $(TST_BIN_DIR)/options
 
 $(TST_BIN_DIR)/options: $(TST_DIR)/options/main.o
 	@echo "Linking $@"
-	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LIBPATH) $(LIB_FILE) $(LIBS) 
+	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LDFLAGS) $(LIBPATH) $(LIBRARIES) $(LIB_FILE) $(LIBS) 
 
 $(TST_DIR)/options/main.o: $(TST_DIR)/options/main.c
 	@echo "Building object '$@'"

@@ -159,7 +159,7 @@ SystemLogHandler(
 		
 	switch(level)
 	{
-#if defined(CE_DEBUG_BUILD)
+#if 0 // defined(CE_DEBUG_BUILD)
 		case CE_LOG_LEVEL_DEBUG: 	 { prefix = CE_LOG_PREFIX_DEBUG; 		break; }
 #else
 		case CE_LOG_LEVEL_DEBUG: 	 { return CL_SUCCESS; }

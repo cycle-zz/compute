@@ -37,8 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**************************************************************************************************/
 
 const char*
-ceGetTypeString(ce_type type)
+ceGetTypeString(ce_type type, ce_status* status)
 {
+	if(status)
+		(*status) = CE_SUCCESS;
+	
 	switch(type)
 	{
 	case CE_TYPE_INVALID: 				return "ce_invalid";
@@ -68,16 +71,28 @@ ceGetTypeString(ce_type type)
 	case CE_TYPE_PROFILING_INFO: 		return "ce_profiling_info";
 	case CE_TYPE_UNKNOWN:
 	default:
-		return "unknown type";
+		{
+			if(status)
+				(*status) = CE_INVALID_TYPE;
+		
+			return "unknown type";
+		}
 	};
+
+	if(status)
+		(*status) = CE_INVALID_TYPE;
 	
 	return "unknown type";
 }
 
 const char*
-ceGetStatusString(ce_status status)
+ceGetStatusString(ce_status value, ce_status *status)
 {
-	switch(status)
+
+	if(status)
+		(*status) = CE_SUCCESS;
+
+	switch(value)
 	{
 	case CE_SUCCESS:					return "success";
 	case CE_INVALID_TYPE:				return "invalid type";
@@ -100,8 +115,16 @@ ceGetStatusString(ce_status status)
 	case CE_SIZE_MISMATCH:				return "size mismatch";
 	case CE_INVALID_STATUS:				return "invalid status";
 	default:
-		return "unknown status";
+		{
+			if(status)
+				(*status) = CE_INVALID_STATUS;
+			
+			return "unknown status";
+		}
 	};
+
+	if(status)
+		(*status) = CE_INVALID_STATUS;
 	
 	return "unknown";
 

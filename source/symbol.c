@@ -88,6 +88,89 @@ ceCreateSymbol(
     return (ce_symbol)symbol;
 }
 
+
+ce_symbol
+ceCreateSymbolFromValue(
+	ce_session session, ce_value value, ce_status* status)
+{
+	char buffer[256] = {0};
+
+	int count = 0;
+	switch(ceGetValueType(value, status))
+	{
+		case (CE_TYPE_BOOL):
+		{
+			count = snprintf(buffer, sizeof(buffer), "%s", ceGetBoolValue(value, status) == CE_TRUE ? "true" : "false");
+			break;
+		}
+		case (CE_TYPE_CHAR):
+		{
+			count = 1;
+			buffer[0] = ceGetCharValue(value, status);
+			break;
+		}
+		case (CE_TYPE_UCHAR):
+		{
+			count = 1;
+			buffer[0] = ceGetUCharValue(value, status);
+			break;
+		}
+		case (CE_TYPE_SHORT):
+		{
+			count = snprintf(buffer, sizeof(buffer), "%d", ceGetShortValue(value, status));
+			break;
+		}
+		case (CE_TYPE_USHORT):
+		{
+			count = snprintf(buffer, sizeof(buffer), "%u", ceGetUShortValue(value, status));
+			break;
+		}
+		case (CE_TYPE_INT):
+		{
+			count = snprintf(buffer, sizeof(buffer), "%d", ceGetIntValue(value, status));
+			break;
+		}
+		case (CE_TYPE_UINT):
+		{
+			count = snprintf(buffer, sizeof(buffer), "%u", ceGetUIntValue(value, status));
+			break;
+		}
+		case (CE_TYPE_LONG):
+		{
+			count = snprintf(buffer, sizeof(buffer), "%lld", ceGetLongValue(value, status));
+			break;
+		}
+		case (CE_TYPE_ULONG):
+		{
+			count = snprintf(buffer, sizeof(buffer), "%llu", ceGetULongValue(value, status));
+			break;
+		}
+		case (CE_TYPE_FLOAT):
+		{
+			count = snprintf(buffer, sizeof(buffer), "%f", ceGetFloatValue(value, status));
+			break;
+		}
+		case (CE_TYPE_DOUBLE):
+		{
+			count = snprintf(buffer, sizeof(buffer), "%f", ceGetDoubleValue(value, status));
+			break;
+		}
+		case (CE_TYPE_SYMBOL):
+		{
+			return ceGetSymbolValue(value, status);
+			break;
+		}
+		default:
+			return NULL;	
+	}
+	
+	if(count)
+		return ceCreateSymbol(session, buffer, strlen(buffer));
+
+	return NULL;	
+}
+
+
 void 
 ceReleaseSymbol(
 	ce_symbol handle)

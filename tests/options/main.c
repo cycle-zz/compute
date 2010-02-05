@@ -34,42 +34,42 @@ main(int argc, char *argv[])
 		{ "--float=42.0", 		ceCreateFloatValue(session, 	42.0f)  },
 		{ "--double=42.0",  	ceCreateDoubleValue(session, 	42.0) 	},
 	};
-	test_argc = sizeof(values) / sizeof(test_value_t) - 1;
+	test_argc = sizeof(values) / sizeof(test_value_t);
 	
 	for(i = 0; i < test_argc; i++)
 		test_argv[i] = values[i].flag;
 
 	i = 0;
   	options[i++] = ceCreateOption(session, "symbol",	CE_TYPE_SYMBOL, "Test symbol option");
-  	options[i++] = ceCreateOption(session, "bool",	CE_TYPE_BOOL, "Test boolean option");
-  	options[i++] = ceCreateOption(session, "char",	CE_TYPE_CHAR, "Test char option");
-  	options[i++] = ceCreateOption(session, "uchar",	CE_TYPE_UCHAR, "Test unsigned char option");
-  	options[i++] = ceCreateOption(session, "short",	CE_TYPE_SHORT, "Test short option");
+  	options[i++] = ceCreateOption(session, "bool",		CE_TYPE_BOOL, "Test boolean option");
+  	options[i++] = ceCreateOption(session, "char",		CE_TYPE_CHAR, "Test char option");
+  	options[i++] = ceCreateOption(session, "uchar",		CE_TYPE_UCHAR, "Test unsigned char option");
+  	options[i++] = ceCreateOption(session, "short",		CE_TYPE_SHORT, "Test short option");
   	options[i++] = ceCreateOption(session, "ushort",	CE_TYPE_USHORT, "Test unsigned short option");
-  	options[i++] = ceCreateOption(session, "int",	CE_TYPE_INT, "Test int option");
-  	options[i++] = ceCreateOption(session, "uint",	CE_TYPE_UINT, "Test unsigned int option");
-  	options[i++] = ceCreateOption(session, "long",	CE_TYPE_LONG, "Test long option");
-  	options[i++] = ceCreateOption(session, "ulong",	CE_TYPE_ULONG, "Test unsigned long option");
-  	options[i++] = ceCreateOption(session, "float",	CE_TYPE_FLOAT, "Test float option");
+  	options[i++] = ceCreateOption(session, "int",		CE_TYPE_INT, "Test int option");
+  	options[i++] = ceCreateOption(session, "uint",		CE_TYPE_UINT, "Test unsigned int option");
+  	options[i++] = ceCreateOption(session, "long",		CE_TYPE_LONG, "Test long option");
+  	options[i++] = ceCreateOption(session, "ulong",		CE_TYPE_ULONG, "Test unsigned long option");
+  	options[i++] = ceCreateOption(session, "float",		CE_TYPE_FLOAT, "Test float option");
   	options[i++] = ceCreateOption(session, "double",	CE_TYPE_DOUBLE, "Test double option");
   	count = i;
 
-  	ceParseCommandLineOptions(CE_DEFAULT_SESSION, test_argc, test_argv, count, options);
+  	ceParseCommandLineOptions(CE_DEFAULT_SESSION, count, test_argv, count, options);
   	
   	ce_status status = 0;
   	for(i = 0; i < count; i++)
   	{
   		ce_value parsed = ceGetOptionValue(options[i], NULL);
-		ce_type type = ceGetValueType(parsed, &status);
-  		if(type == CE_TYPE_SYMBOL)
-  			ceDebug(CE_DEFAULT_SESSION, "Option[%3d]: name='%s' type='%s' parsed='%s' expected='%s'\n", i, 
-				ceGetOptionName(options[i], &status), ceGetTypeString(type, &status), ceGetSymbolName(parsed.data.as_symbol), ceGetSymbolName(expected.data.as_symbol));
- 
-  		else
-			ceDebug(CE_DEFAULT_SESSION, "Option[%3d]: name='%s' type='%d' parsed='%d/%f' expected='%d/%f'\n", i, 
-				ceGetOptionName(options[i]), ceGetTypeName(type, &status), parsed.data.as_long, parsed.data.as_float, values[i].value.data.as_long, values[i].value.data.as_float);
-
-  		ceAssert(ceIsValueEqual(parsed, expected));
+  		ce_value expected = values[i].value;
+	
+		ceInfo(CE_DEFAULT_SESSION, "Option[%3d]: name='%s' parsed='%s'(%s) expected='%s'(%s)\n", i, 
+			ceGetOptionName(options[i], &status), 
+			ceGetSymbolName(ceCreateSymbolFromValue(session, parsed,    &status)), 
+			ceGetTypeString(ceGetValueType(parsed, &status), &status), 
+			ceGetSymbolName(ceCreateSymbolFromValue(session, expected,  &status)),
+			ceGetTypeString(ceGetValueType(expected, &status), &status));
+  		
+  		ceAssert(ceIsValueEqual(parsed, expected, &status));
   	}
   	
   	for(i = 0; i < count; i++)
