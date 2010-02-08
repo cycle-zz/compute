@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_ATOMICS_H__
-#define __CE_ATOMICS_H__
+#ifndef __SC_ATOMICS_H__
+#define __SC_ATOMICS_H__
 
 /**************************************************************************************************/
 
@@ -43,24 +43,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-#if defined(CE_PLATFORM_OSX) && defined(CE_ARCH_PPC)
+#if defined(SC_PLATFORM_OSX) && defined(SC_ARCH_PPC)
 	#include <libkern/OSAtomic.h>
 #endif
 
-#if defined(CE_USE_PTHREADS)
+#if defined(SC_USE_PTHREADS)
 	#include <pthread.h>
 	#include <semaphore.h>
 #endif
 
-#if defined(CE_PLATFORM_WINDOWS)
+#if defined(SC_PLATFORM_WINDOWS)
 
-	typedef volatile LONG 			ce_atomic_int;
-	#if defined(CE_64BIT)
-		typedef volatile LONGLONG 	ce_atomic_long;
+	typedef volatile LONG 			sc_atomic_int;
+	#if defined(SC_64BIT)
+		typedef volatile LONGLONG 	sc_atomic_long;
 	#endif
 
 	#if _(MSC_VER >= 1300)
@@ -72,28 +72,28 @@ CE_EXTERN_C_BEGIN
 
 #else
 
-	typedef volatile ce_int 		ce_atomic_int;
-	#if defined(CE_64BIT)
-		typedef volatile ce_long 	ce_atomic_long;
+	typedef volatile sc_int 		sc_atomic_int;
+	#if defined(SC_64BIT)
+		typedef volatile sc_long 	sc_atomic_long;
 	#endif
 
 #endif
 
 /**************************************************************************************************/
 
-CE_INLINE ce_int 
-ceAtomicAddInt(
-	ce_atomic_int *v, 
-	ce_int delta) 
+SC_INLINE sc_int 
+scAtomicAddInt(
+	sc_atomic_int *v, 
+	sc_int delta) 
 {
-#if defined(CE_PLATFORM_WINDOWS)
-	#if defined(CE_64BIT)
+#if defined(SC_PLATFORM_WINDOWS)
+	#if defined(SC_64BIT)
     	
     	return InterlockedAdd(v, delta);
     	
 	#else
 		
-		ce_int result;
+		sc_int result;
 		_ReadWriteBarrier();
 		__asm {
 			__asm mov edx, v
@@ -106,13 +106,13 @@ ceAtomicAddInt(
 		return result + delta;
 	
 	#endif
-#elif defined(CE_PLATFORM_MACOSX) && defined(CE_ARCH_PPC)
+#elif defined(SC_PLATFORM_MACOSX) && defined(SC_ARCH_PPC)
 
     return OSAtomicAdd32Barrier(delta, v);
 
 #else
     
-    ce_int result;
+    sc_int result;
     
     __asm__ __volatile__(
     	"lock\n"
@@ -128,24 +128,24 @@ ceAtomicAddInt(
 
 /**************************************************************************************************/
 
-#if defined(CE_64BIT)
+#if defined(SC_64BIT)
 
-CE_INLINE ce_long 
-ceAtomicAddLong(
-	ce_atomic_long *v, 
-	ce_long delta) 
+SC_INLINE sc_long 
+scAtomicAddLong(
+	sc_atomic_long *v, 
+	sc_long delta) 
 {
-#if defined(CE_PLATFORM_WINDOWS)
+#if defined(SC_PLATFORM_WINDOWS)
 
     return InterlockedAdd64(v, delta);
 
-#elif defined(CE_PLATFORM_MACOSX) && defined(CE_ARCH_PPC)
+#elif defined(SC_PLATFORM_MACOSX) && defined(SC_ARCH_PPC)
 
     return OSAtomicAdd64Barrier(delta, v);
 
 #else
 
-    ce_long result;
+    sc_long result;
     __asm__ __volatile__(
 	 	"lock\nxaddq %0,%1"
 	  : "=r"(result), "=m"(*v)
@@ -160,24 +160,24 @@ ceAtomicAddLong(
 
 /**************************************************************************************************/
     
-CE_INLINE ce_int 
-ceAtomicCompareAndSwapInt(
-	ce_atomic_int *v, 
-	ce_int new_value, 
-	ce_int old_value) 
+SC_INLINE sc_int 
+scAtomicCompareAndSwapInt(
+	sc_atomic_int *v, 
+	sc_int new_value, 
+	sc_int old_value) 
 {
 
-#if defined(CE_PLATFORM_WINDOWS)
+#if defined(SC_PLATFORM_WINDOWS)
 
     return InterlockedCompareExchange(v, new_value, old_value);
 
-#elif defined(CE_PLATFORM_MACOSX) && defined(CE_ARCH_PPC)
+#elif defined(SC_PLATFORM_MACOSX) && defined(SC_ARCH_PPC)
 
     return OSAtomicCompareAndSwap32Barrier(old_value, new_value, v);
 
 #else
 
-    ce_int result;
+    sc_int result;
 
     __asm__ __volatile__(
     	"lock\ncmpxchgl %2,%1"
@@ -191,25 +191,25 @@ ceAtomicCompareAndSwapInt(
 
 /**************************************************************************************************/
 
-#if defined(CE_64BIT)
-CE_INLINE ce_long 
-ceAtomicCompareAndSwapLong(
-	ce_atomic_long *v, 
-	ce_long new_value, 
-	ce_long old_value) 
+#if defined(SC_64BIT)
+SC_INLINE sc_long 
+scAtomicCompareAndSwapLong(
+	sc_atomic_long *v, 
+	sc_long new_value, 
+	sc_long old_value) 
 {
 
-#if defined(CE_PLATFORM_WINDOWS)
+#if defined(SC_PLATFORM_WINDOWS)
 
     return InterlockedCompareExchange64(v, new_value, old_value);
 
-#elif defined(CE_PLATFORM_MACOSX) && defined(CE_ARCH_PPC)
+#elif defined(SC_PLATFORM_MACOSX) && defined(SC_ARCH_PPC)
 
     return OSAtomicCompareAndSwap64Barrier(old_value, new_value, v);
 
 #else
 
-    ce_long result;
+    sc_long result;
 
     __asm__ __volatile__(
     	"lock\ncmpxchgq %2,%1"
@@ -221,23 +221,23 @@ ceAtomicCompareAndSwapLong(
 
 #endif
 }
-#endif /* CE_64BIT */
+#endif /* SC_64BIT */
 
 /**************************************************************************************************/
 
-CE_INLINE void*
-ceAtomicCompareAndSwapPtr(
+SC_INLINE void*
+scAtomicCompareAndSwapPtr(
 	void **v, 
 	void *new_value, 
 	void *old_value) 
 {
 
-#if defined(CE_PLATFORM_WINDOWS)
+#if defined(SC_PLATFORM_WINDOWS)
 
     return InterlockedCompareExchange(v, new_value, old_value);
 
-#elif defined(CE_PLATFORM_MACOSX) && defined(CE_ARCH_PPC)
-  #if defined(CE_64BIT)
+#elif defined(SC_PLATFORM_MACOSX) && defined(SC_ARCH_PPC)
+  #if defined(SC_64BIT)
 
     return OSAtomicCompareAndSwap64Barrier(old_value, new_value, v);
 
@@ -250,7 +250,7 @@ ceAtomicCompareAndSwapPtr(
 
     void *result;
 
-#if defined(CE_64BIT)
+#if defined(SC_64BIT)
 
     __asm__ __volatile__(
     	"lock\ncmpxchgq %2,%1"
@@ -266,7 +266,7 @@ ceAtomicCompareAndSwapPtr(
 	  : "q"(new_value), "0"(old_value)
 	  : "memory");
 
-#endif /* CE_64BIT */
+#endif /* SC_64BIT */
 
     return result;
     
@@ -275,30 +275,30 @@ ceAtomicCompareAndSwapPtr(
 
 /**************************************************************************************************/
 
-CE_INLINE ce_float 
-ceAtomicAddFloat(
-	volatile ce_float *val, 
-	ce_float delta) 
+SC_INLINE sc_float 
+scAtomicAddFloat(
+	volatile sc_float *val, 
+	sc_float delta) 
 {
-    typedef union _ce_bits_t { ce_float f; ce_int i; } ce_bits_t;
-    ce_bits_t old_value, new_value;
+    typedef union _sc_bits_t { sc_float f; sc_int i; } sc_bits_t;
+    sc_bits_t old_value, new_value;
     do {
 
-#if defined(CE_ARCH_X86)
+#if defined(SC_ARCH_X86)
         __asm__ __volatile__ ("pause\n");
 #endif
         old_value.f = *val;
         new_value.f = old_value.f + delta;
 
-    } while (ceAtomicCompareAndSwapInt(((ce_atomic_int *)val), new_value.i, old_value.i) != old_value.i);
+    } while (scAtomicCompareAndSwapInt(((sc_atomic_int *)val), new_value.i, old_value.i) != old_value.i);
     
     return new_value.f;
 }
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
+SC_EXTERN_C_END
 
 /**************************************************************************************************/
 
-#endif /* __CE_ATOMICS_H__ */
+#endif /* __SC_ATOMICS_H__ */

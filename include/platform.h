@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,105 +32,105 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_PLATFORM_H__
-#define __CE_PLATFORM_H__
+#ifndef __SC_PLATFORM_H__
+#define __SC_PLATFORM_H__
 
 /* Platform  **************************************************************************************/
 
-#if defined(__APPLE__) && !defined(CE_PLATFORM_MACOSX)
-	#define CE_PLATFORM_MACOSX	(1)
-#elif (defined (_WIN32) || defined(__WIN32__)) && defined(_MSC_VER) && !defined(CE_PLATFORM_WINDOWS)
-	#define CE_PLATFORM_WINDOWS	(1)
-#elif (defined(linux) || defined(__linux) || defined (__linux__)) && !defined(CE_PLATFORM_LINUX)
-	#define CE_PLATFORM_LINUX	(1)
+#if defined(__APPLE__) && !defined(SC_PLATFORM_MACOSX)
+	#define SC_PLATFORM_MACOSX	(1)
+#elif (defined (_WIN32) || defined(__WIN32__)) && defined(_MSC_VER) && !defined(SC_PLATFORM_WINDOWS)
+	#define SC_PLATFORM_WINDOWS	(1)
+#elif (defined(linux) || defined(__linux) || defined (__linux__)) && !defined(SC_PLATFORM_LINUX)
+	#define SC_PLATFORM_LINUX	(1)
 #endif
 
 #if !(defined(__i386__) || defined(__amd64__))
-	#define CE_ARCH_PPC		(1)
+	#define SC_ARCH_PPC		(1)
 #endif
 
 #if (defined(__i386__) || defined(__amd64__))
-	#define CE_ARCH_X86		(1)
+	#define SC_ARCH_X86		(1)
 	#if defined(__amd64__)
-		#define CE_64BIT	(1)
+		#define SC_64BIT	(1)
 	#else
-		#define CE_32BIT	(1)
+		#define SC_32BIT	(1)
 	#endif
 #endif
 
 /* C Declaration **********************************************************************************/
 
-#if !defined(CE_EXTERN_C_BEGIN)
+#if !defined(SC_EXTERN_C_BEGIN)
 	#if defined(__cplusplus)
-		#define CE_EXTERN_C_BEGIN extern CE_API_EXPORT "C" {
-		#define CE_EXTERN_C_END   }
+		#define SC_EXTERN_C_BEGIN extern SC_API_EXPORT "C" {
+		#define SC_EXTERN_C_END   }
 	#else
-		#define CE_EXTERN_C_BEGIN
-		#define CE_EXTERN_C_END
+		#define SC_EXTERN_C_BEGIN
+		#define SC_EXTERN_C_END
 	#endif
 #endif
 
 /* Restrict Declaration ***************************************************************************/
 
 #if !defined(__cplusplus) && defined(__GNUC__)
-	#define CE_RESTRICT			restrict
+	#define SC_RESTRICT			restrict
 #else
-	#define CE_RESTRICT
+	#define SC_RESTRICT
 #endif
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
 
 /* Export Declaration *****************************************************************************/
 
-#if defined(CE_PLATFORM_WINDOWS)
-	#if defined(CE_SHARED_LIB_TARGET) && defined(CE_SHARED_LIB_EXPORT)
-		#define CE_API_EXPORT 				__declspec(dllexport) 
-	#elif defined(CE_SHARED_LIB_TARGET)
-		#define CE_API_EXPORT 				__declspec(dllimport) 
+#if defined(SC_PLATFORM_WINDOWS)
+	#if defined(SC_SHARED_LIB_TARGET) && defined(SC_SHARED_LIB_EXPORT)
+		#define SC_API_EXPORT 				__declspec(dllexport) 
+	#elif defined(SC_SHARED_LIB_TARGET)
+		#define SC_API_EXPORT 				__declspec(dllimport) 
 	#endif
 #else
-	#define CE_API_EXPORT
+	#define SC_API_EXPORT
 #endif
 
 /* Inline Declaration *****************************************************************************/
 
-#if !defined(CE_INLINE)
+#if !defined(SC_INLINE)
 	#if defined(__GNUC__) && (__GNUC__ == 4) && !defined(DEBUG)
-		#define CE_INLINE 			static __inline__ __attribute__((always_inline))
+		#define SC_INLINE 			static __inline__ __attribute__((always_inline))
 	#elif defined(__GNUC__)
-		#define CE_INLINE 			static __inline__
+		#define SC_INLINE 			static __inline__
 	#elif defined(__cplusplus)
-		#define CE_INLINE 			static inline
+		#define SC_INLINE 			static inline
 	#elif defined(_MSC_VER)
-		#define CE_INLINE 			static __inline
+		#define SC_INLINE 			static __inline
 	#elif defined(__WIN32__)
-		#define CE_INLINE			static __inline__
+		#define SC_INLINE			static __inline__
 	#endif
 #endif
 
 /* alignment detection *********************************************************/
 
 #if defined(__GNUC__)
-	#define CE_DECLARE_ALIGNED(x) 
-	#define CE_ALIGN_ATTRIBUTE(x) __attribute__ ((aligned(x)))
+	#define SC_DECLARE_ALIGNED(x) 
+	#define SC_ALIGN_ATTRIBUTE(x) __attribute__ ((aligned(x)))
 #elif defined(_MSC_VER)
-	#define CE_DECLARE_ALIGNED(x) __declspec(align( x )) 
-	#define CE_ALIGN_ATTRIBUTE(x) 
+	#define SC_DECLARE_ALIGNED(x) __declspec(align( x )) 
+	#define SC_ALIGN_ATTRIBUTE(x) 
 #else
-	#define CE_DECLARE_ALIGNED(x)
-	#define CE_ALIGN_ATTRIBUTE(x)
+	#define SC_DECLARE_ALIGNED(x)
+	#define SC_ALIGN_ATTRIBUTE(x)
 #endif
 
 /* Helper Macros **************************************************************/
 
-#define CE_CONCAT(a,b)		a##b
-#define CE_MAKE_NAME(a,b)	CE_CONCAT(a,b)
+#define SC_CONCAT(a,b)		a##b
+#define SC_MAKE_NAME(a,b)	SC_CONCAT(a,b)
 
 /* OS Dependent Headers *******************************************************/
 
-#if defined(CE_PLATFORM_WINDOWS)
+#if defined(SC_PLATFORM_WINDOWS)
 	#include <windows.h>
 	#include <CL/cl.h>
 #else
@@ -141,7 +141,7 @@ CE_EXTERN_C_BEGIN
     #include <string.h>
     #include <stdarg.h>
 
-	#if defined(CE_PLATFORM_MACOSX)
+	#if defined(SC_PLATFORM_MACOSX)
 		#include <OpenCL/opencl.h>
 	#else
 		#include <CL/cl.h>
@@ -158,18 +158,18 @@ CE_EXTERN_C_BEGIN
 #include <math.h>
 #include <ctype.h>
 
-#if defined(CE_DEBUG_BUILD)
-#define ceAssert(expr) \
+#if !defined(SC_RELEASE_BUILD)
+#define scAssert(expr) \
     ((expr) ? (void)0 : \
-        ceCritical(CE_DEFAULT_SESSION, "Assertion \"%s\" failed in %s, line %d!\n", \
+        scCritical(SC_DEFAULT_SESSION, "Assertion \"%s\" failed in %s, line %d!\n", \
                #expr, __FILE__, __LINE__))
 #else
-#define ceAssert(expr) do{ } while(0)
+#define scAssert(expr) do{ } while(0)
 #endif
 
 /******************************************************************************/
 
-CE_EXTERN_C_END
+SC_EXTERN_C_END
 
-#endif	/* __CE_PLATFORM_H__ */
+#endif	/* __SC_PLATFORM_H__ */
 

@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -36,20 +36,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-typedef struct _ce_symbol_t {
-	ce_session					session;
-	ce_uint						hash;
+typedef struct _sc_symbol_t {
+	sc_session					session;
+	sc_uint						hash;
 	char* 						name;
-	ce_uint						length;
-} ce_symbol_t;
+	sc_uint						length;
+} sc_symbol_t;
 
 /**************************************************************************************************/
 
-static ce_uint
+static sc_uint
 HashString(const char *str)
 {
     int c;
-    ce_uint hash = 5381;
+    sc_uint hash = 5381;
     
     while ((c = (*str++)) != 0)
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
@@ -59,21 +59,21 @@ HashString(const char *str)
 
 /**************************************************************************************************/
 
-ce_symbol
-ceCreateSymbol(
-	ce_session session, 
+sc_symbol
+scCreateSymbol(
+	sc_session session, 
 	const char* name, 
 	size_t length)
 {
-	ce_symbol_t* symbol;
-	symbol = ceAllocate(session, sizeof(ce_symbol_t));
+	sc_symbol_t* symbol;
+	symbol = scAllocate(session, sizeof(sc_symbol_t));
 	if(!symbol)
 		return NULL;
 
-	memset(symbol, 0, sizeof(ce_symbol_t));
+	memset(symbol, 0, sizeof(sc_symbol_t));
 
 	length++;
-	symbol->name = ceAllocate(session, sizeof(char) * length);
+	symbol->name = scAllocate(session, sizeof(char) * length);
     if(symbol->name) 
     {
 	    snprintf(symbol->name, length, "%s", name);
@@ -81,83 +81,83 @@ ceCreateSymbol(
 		symbol->hash = HashString(name);    
 		symbol->session = session;
 
-	    ceDebug(symbol->session, "Created symbol: name='%s' length='%d' hash='%u' session='%p'\n",
+	    scDebug(symbol->session, "Created symbol: name='%s' length='%d' hash='%u' session='%p'\n",
 	    		symbol->name, symbol->length, symbol->hash, symbol->session);
 	}
     
-    return (ce_symbol)symbol;
+    return (sc_symbol)symbol;
 }
 
 
-ce_symbol
-ceCreateSymbolFromValue(
-	ce_session session, ce_value value, ce_status* status)
+sc_symbol
+scCreateSymbolFromValue(
+	sc_session session, sc_value value, sc_status* status)
 {
 	char buffer[256] = {0};
 
 	int count = 0;
-	switch(ceGetValueType(value, status))
+	switch(scGetValueType(value, status))
 	{
-		case (CE_TYPE_BOOL):
+		case (SC_TYPE_BOOL):
 		{
-			count = snprintf(buffer, sizeof(buffer), "%s", ceGetBoolValue(value, status) == CE_TRUE ? "true" : "false");
+			count = snprintf(buffer, sizeof(buffer), "%s", scGetBoolValue(value, status) == SC_TRUE ? "true" : "false");
 			break;
 		}
-		case (CE_TYPE_CHAR):
+		case (SC_TYPE_CHAR):
 		{
 			count = 1;
-			buffer[0] = ceGetCharValue(value, status);
+			buffer[0] = scGetCharValue(value, status);
 			break;
 		}
-		case (CE_TYPE_UCHAR):
+		case (SC_TYPE_UCHAR):
 		{
 			count = 1;
-			buffer[0] = ceGetUCharValue(value, status);
+			buffer[0] = scGetUCharValue(value, status);
 			break;
 		}
-		case (CE_TYPE_SHORT):
+		case (SC_TYPE_SHORT):
 		{
-			count = snprintf(buffer, sizeof(buffer), "%d", ceGetShortValue(value, status));
+			count = snprintf(buffer, sizeof(buffer), "%d", scGetShortValue(value, status));
 			break;
 		}
-		case (CE_TYPE_USHORT):
+		case (SC_TYPE_USHORT):
 		{
-			count = snprintf(buffer, sizeof(buffer), "%u", ceGetUShortValue(value, status));
+			count = snprintf(buffer, sizeof(buffer), "%u", scGetUShortValue(value, status));
 			break;
 		}
-		case (CE_TYPE_INT):
+		case (SC_TYPE_INT):
 		{
-			count = snprintf(buffer, sizeof(buffer), "%d", ceGetIntValue(value, status));
+			count = snprintf(buffer, sizeof(buffer), "%d", scGetIntValue(value, status));
 			break;
 		}
-		case (CE_TYPE_UINT):
+		case (SC_TYPE_UINT):
 		{
-			count = snprintf(buffer, sizeof(buffer), "%u", ceGetUIntValue(value, status));
+			count = snprintf(buffer, sizeof(buffer), "%u", scGetUIntValue(value, status));
 			break;
 		}
-		case (CE_TYPE_LONG):
+		case (SC_TYPE_LONG):
 		{
-			count = snprintf(buffer, sizeof(buffer), "%lld", ceGetLongValue(value, status));
+			count = snprintf(buffer, sizeof(buffer), "%lld", scGetLongValue(value, status));
 			break;
 		}
-		case (CE_TYPE_ULONG):
+		case (SC_TYPE_ULONG):
 		{
-			count = snprintf(buffer, sizeof(buffer), "%llu", ceGetULongValue(value, status));
+			count = snprintf(buffer, sizeof(buffer), "%llu", scGetULongValue(value, status));
 			break;
 		}
-		case (CE_TYPE_FLOAT):
+		case (SC_TYPE_FLOAT):
 		{
-			count = snprintf(buffer, sizeof(buffer), "%f", ceGetFloatValue(value, status));
+			count = snprintf(buffer, sizeof(buffer), "%f", scGetFloatValue(value, status));
 			break;
 		}
-		case (CE_TYPE_DOUBLE):
+		case (SC_TYPE_DOUBLE):
 		{
-			count = snprintf(buffer, sizeof(buffer), "%f", ceGetDoubleValue(value, status));
+			count = snprintf(buffer, sizeof(buffer), "%f", scGetDoubleValue(value, status));
 			break;
 		}
-		case (CE_TYPE_SYMBOL):
+		case (SC_TYPE_SYMBOL):
 		{
-			return ceGetSymbolValue(value, status);
+			return scGetSymbolValue(value, status);
 			break;
 		}
 		default:
@@ -165,61 +165,61 @@ ceCreateSymbolFromValue(
 	}
 	
 	if(count)
-		return ceCreateSymbol(session, buffer, strlen(buffer));
+		return scCreateSymbol(session, buffer, strlen(buffer));
 
 	return NULL;	
 }
 
 
 void 
-ceReleaseSymbol(
-	ce_symbol handle)
+scReleaseSymbol(
+	sc_symbol handle)
 {
-	ce_session session = NULL;
-	ce_symbol_t* symbol = (ce_symbol_t*)handle;
+	sc_session session = NULL;
+	sc_symbol_t* symbol = (sc_symbol_t*)handle;
 	if(symbol && symbol->name) 
 	{
 		session = symbol->session;
-		ceDeallocate(session, symbol->name);
+		scDeallocate(session, symbol->name);
 		symbol->name = NULL;
 	}
-	ceDeallocate(session, symbol);
+	scDeallocate(session, symbol);
 }
 
-ce_bool
-ceIsSymbolNameEqual(
-	ce_symbol a, ce_symbol b)
+sc_bool
+scIsSymbolNameEqual(
+	sc_symbol a, sc_symbol b)
 {
 	if(!a || !b)
-		return CE_FALSE;
+		return SC_FALSE;
 		
-	return ( ceGetSymbolHash(a) == ceGetSymbolHash(b) );
+	return ( scGetSymbolHash(a) == scGetSymbolHash(b) );
 }
 
 const char*
-ceGetSymbolName(
-	ce_symbol handle)
+scGetSymbolName(
+	sc_symbol handle)
 {
 	if(handle == NULL) return NULL;
-	ce_symbol_t* symbol = (ce_symbol_t*)handle;
+	sc_symbol_t* symbol = (sc_symbol_t*)handle;
 	return symbol->name;
 }
 
-ce_uint 
-ceGetSymbolHash(
-	ce_symbol handle)
+sc_uint 
+scGetSymbolHash(
+	sc_symbol handle)
 {
 	if(handle == NULL) return 0;
-	ce_symbol_t* symbol = (ce_symbol_t*)handle;
+	sc_symbol_t* symbol = (sc_symbol_t*)handle;
 	return symbol->hash;
 }
 
 size_t
-ceGetSymbolLength(
-	ce_symbol handle)
+scGetSymbolLength(
+	sc_symbol handle)
 {
 	if(handle == NULL) return 0;
-	ce_symbol_t* symbol = (ce_symbol_t*)handle;
+	sc_symbol_t* symbol = (sc_symbol_t*)handle;
 	return symbol->length;
 }
 

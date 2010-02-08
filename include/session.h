@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_SESSION_H__
-#define __CE_SESSION_H__
+#ifndef __SC_SESSION_H__
+#define __SC_SESSION_H__
 
 /**************************************************************************************************/
 
@@ -41,47 +41,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-#define CE_DEFAULT_SESSION	(NULL)
-
-typedef struct _ce_session_t {
-    cl_platform_id											platform;
-    cl_context 												context;
-	cl_uint													units;
-	cl_device_id *											devices;
-	cl_command_queue *										queues;
-    ce_map													programs;
-	ce_map													kernels;
-    ce_map													mem;
-	ce_session_memory_info									memory;
-	ce_profiling_info										profiling;
-	ce_logging_info											logging;
-	ce_bool													valid;
-} ce_session_t;
-
+#define SC_DEFAULT_SESSION	(NULL)
 
 /**************************************************************************************************/
 
-extern CE_API_EXPORT ce_session
-ceCreateSessionForHost(void);
+extern SC_API_EXPORT sc_session
+scCreateSessionForHost(void);
 
-extern CE_API_EXPORT ce_session
-ceCreateSessionForDeviceType(cl_device_type device_type, cl_uint device_count);
+extern SC_API_EXPORT sc_session
+scCreateSessionForDeviceType(sc_device_type device_type, sc_uint device_count, sc_status *status);
 
-extern CE_API_EXPORT ce_status
-ceReleaseSession(ce_session session);
+extern SC_API_EXPORT sc_status
+scReleaseSession(sc_session session);
 
-extern CE_API_EXPORT cl_bool
-ceIsValidSession(ce_session session);
+extern SC_API_EXPORT sc_bool
+scIsValidSession(sc_session session);
 
-extern CE_API_EXPORT cl_bool
-ceIsValidDeviceIndexForSession(ce_session session, cl_uint device_index);
+extern SC_API_EXPORT sc_bool
+scIsValidDeviceIndexForSession(sc_session session, sc_uint device_index);
+
+extern SC_API_EXPORT sc_logging_info
+scGetLoggingInfo(sc_session session, sc_status *status);
+
+extern SC_API_EXPORT sc_memory_info
+scGetMemoryInfo(sc_session session, sc_status *status);
+
+extern SC_API_EXPORT sc_profiling_info
+scGetProfilingInfo(sc_session session, sc_status *status);
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
+SC_EXTERN_C_END
 
-#endif /* __CE_SESSION_H__ */
+#endif /* __SC_SESSION_H__ */

@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -33,50 +33,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ***************************************************************************************************/
 
 #include "logging.h"
+#include "status.h"
 
 /**************************************************************************************************/
 
-#define CE_LOG_LEVEL_DEBUG					(1)
-#define CE_LOG_LEVEL_TEST					(2)
-#define CE_LOG_LEVEL_INFO					(3)
-#define CE_LOG_LEVEL_WARNING				(4)
-#define CE_LOG_LEVEL_CRITICAL				(5)
-#define CE_LOG_LEVEL_ERROR					(6)
+#define SC_LOG_LEVEL_DEBUG					(1)
+#define SC_LOG_LEVEL_TEST					(2)
+#define SC_LOG_LEVEL_INFO					(3)
+#define SC_LOG_LEVEL_WARNING				(4)
+#define SC_LOG_LEVEL_CRITICAL				(5)
+#define SC_LOG_LEVEL_ERROR					(6)
 
-#define CE_LOG_PREFIX_TEST					"[test]"
-#define CE_LOG_PREFIX_DEBUG					"[debug]"
-#define CE_LOG_PREFIX_INFO					"[info]"
-#define CE_LOG_PREFIX_WARNING				"[warning]"
-#define CE_LOG_PREFIX_CRITICAL				"[critical]"
-#define CE_LOG_PREFIX_ERROR					"[error]"
+#define SC_LOG_PREFIX_TEST					"[test]"
+#define SC_LOG_PREFIX_DEBUG					"[debug]"
+#define SC_LOG_PREFIX_INFO					"[info]"
+#define SC_LOG_PREFIX_WARNING				"[warning]"
+#define SC_LOG_PREFIX_CRITICAL				"[critical]"
+#define SC_LOG_PREFIX_ERROR					"[error]"
 
 /**************************************************************************************************/
 
-typedef struct _ce_logging_info_t {
-	ce_session	session;
+typedef struct _sc_logging_info_t {
+	sc_session	session;
 	char* 		filename;
 	FILE*		stream;
-	cl_uint 	flags;
-} ce_logging_info_t;
+	sc_bitfield	flags;
+} sc_logging_info_t;
 
 /**************************************************************************************************/
 
-static cl_bool
+static sc_status
 CloseLogFile(
-	ce_logging_info_t* log)
+	sc_logging_info_t* log)
 {
 	if (log && log->stream)
 	{
 		fclose (log->stream);
 		log->stream = NULL;
-		return CL_TRUE;
+		return SC_SUCCESS;
 	}
-	return CL_FALSE;
+	
+	return SC_INVALID_LOGGING_INFO;
 }
 
-static cl_bool
+static sc_status
 OpenLogFile(
-	ce_logging_info_t* log, const char* filename)
+	sc_logging_info_t* log, 
+	const char* filename)
 {
 	static const char *replace = "w";
 	static const char *append = "a+";
@@ -86,25 +89,29 @@ OpenLogFile(
 		CloseLogFile(log);
 	
 	if (filename == NULL)
-		filename = CE_DEFAULT_LOG_FILENAME;
+		filename = SC_DEFAULT_LOG_FILENAME;
 
 	size_t length = strlen(filename) + 1;
-	log->filename = ceAllocate(log->session, length * sizeof(char));
+	log->filename = scAllocate(log->session, length * sizeof(char));
 	snprintf(log->filename, length, "%s", filename);
 	
-	mode = (log->flags & CE_LOG_APPEND) ? append : replace;
+	mode = (log->flags & SC_LOG_APPEND) ? append : replace;
 	log->stream = fopen(log->filename, mode);
 	if (log->stream == NULL)
 	{
 		CloseLogFile(log);
-		return CL_FALSE;
+		return SC_INVALID_LOG_FILE;
 	}
-	return CL_TRUE;
+	return SC_SUCCESS;
 }
 
-static cl_int
+static sc_status
 LogHandler(
-	ce_logging_info_t* log, cl_int level, cl_int status, const char* format, va_list arg_list)
+	sc_logging_info_t* log, 
+	sc_int level, 
+	sc_int status, 
+	const char* format, 
+	va_list arg_list)
 {
 	static char buffer[4096] = {0};
 	const char *prefix = 0;
@@ -112,49 +119,52 @@ LogHandler(
 		
 	switch(level)
 	{
-		case CE_LOG_LEVEL_DEBUG: 	 { prefix = CE_LOG_PREFIX_DEBUG; 		break; }
-		case CE_LOG_LEVEL_TEST: 	 { prefix = CE_LOG_PREFIX_TEST; 		break; }
-		case CE_LOG_LEVEL_INFO: 	 { prefix = CE_LOG_PREFIX_INFO; 		break; }
-		case CE_LOG_LEVEL_WARNING:   { prefix = CE_LOG_PREFIX_WARNING; 		break; }
-		case CE_LOG_LEVEL_CRITICAL:  { prefix = CE_LOG_PREFIX_CRITICAL; 	break; }
-		case CE_LOG_LEVEL_ERROR: 	 { prefix = CE_LOG_PREFIX_ERROR; 		break; }
-		default:	 				 { prefix = CE_LOG_PREFIX_INFO; 		break; }
+		case SC_LOG_LEVEL_DEBUG: 	 { prefix = SC_LOG_PREFIX_DEBUG; 		break; }
+		case SC_LOG_LEVEL_TEST: 	 { prefix = SC_LOG_PREFIX_TEST; 		break; }
+		case SC_LOG_LEVEL_INFO: 	 { prefix = SC_LOG_PREFIX_INFO; 		break; }
+		case SC_LOG_LEVEL_WARNING:   { prefix = SC_LOG_PREFIX_WARNING; 		break; }
+		case SC_LOG_LEVEL_CRITICAL:  { prefix = SC_LOG_PREFIX_CRITICAL; 	break; }
+		case SC_LOG_LEVEL_ERROR: 	 { prefix = SC_LOG_PREFIX_ERROR; 		break; }
+		default:	 				 { prefix = SC_LOG_PREFIX_INFO; 		break; }
 	};
 	
-    if ((log->stream == NULL) && (log->flags & CE_LOG_FILE))
+    if ((log->stream == NULL) && (log->flags & SC_LOG_FILE))
     {
     	OpenLogFile(log, log->filename);
     }
 
    	(void)vsnprintf(buffer, sizeof(buffer), format, arg_list);
-    if (log->flags & CE_LOG_CONSOLE) 
+    if (log->flags & SC_LOG_CONSOLE) 
     {
     	fprintf(stdout, "%s %s", prefix, buffer);
-		if(status != CL_SUCCESS)
+		if(status != SC_SUCCESS)
 		{
-			error = ceGetErrorString(status);
+			error = scGetErrorString(status);
 			fprintf(stdout, "%s %s", prefix, error);
 		}
         fflush(stdout);
     }
 
-    if (log->flags & CE_LOG_FILE)
+    if (log->flags & SC_LOG_FILE)
     {
     	fprintf(log->stream, "%s %s", prefix, buffer);
-		if(status != CL_SUCCESS)
+		if(status != SC_SUCCESS)
 		{
-			error = ceGetErrorString(status);
+			error = scGetErrorString(status);
 			fprintf(log->stream, "%s %s", prefix, error);
 		}
         fflush (log->stream);
     }
     
-    return CL_SUCCESS;
+    return SC_SUCCESS;
 }
 
-static cl_int
+static sc_status
 SystemLogHandler(
-	cl_int level, cl_int status, const char* format, va_list arg_list)
+	sc_int level, 
+	sc_int status, 
+	const char* format, 
+	va_list arg_list)
 {
 	static char buffer[4096] = {0};
 	const char *prefix = 0;
@@ -162,51 +172,51 @@ SystemLogHandler(
 		
 	switch(level)
 	{
-#if defined(CE_DEBUG_BUILD)
-		case CE_LOG_LEVEL_DEBUG: 	 { prefix = CE_LOG_PREFIX_DEBUG; 		break; }
+#if defined(SC_DEBUG_BUILD)
+		case SC_LOG_LEVEL_DEBUG: 	 { prefix = SC_LOG_PREFIX_DEBUG; 		break; }
 #else
-		case CE_LOG_LEVEL_DEBUG: 	 { return CL_SUCCESS; }
+		case SC_LOG_LEVEL_DEBUG: 	 { return SC_SUCCESS; }
 #endif
-		case CE_LOG_LEVEL_TEST: 	 { prefix = CE_LOG_PREFIX_TEST; 		break; }
-		case CE_LOG_LEVEL_INFO: 	 { prefix = CE_LOG_PREFIX_INFO; 		break; }
-		case CE_LOG_LEVEL_WARNING: 	 { prefix = CE_LOG_PREFIX_WARNING; 		break; }
-		case CE_LOG_LEVEL_CRITICAL:  { prefix = CE_LOG_PREFIX_CRITICAL; 	break; }
-		case CE_LOG_LEVEL_ERROR: 	 { prefix = CE_LOG_PREFIX_ERROR; 		break; }
-		default:	 				 { prefix = CE_LOG_PREFIX_INFO; 		break; }
+		case SC_LOG_LEVEL_TEST: 	 { prefix = SC_LOG_PREFIX_TEST; 		break; }
+		case SC_LOG_LEVEL_INFO: 	 { prefix = SC_LOG_PREFIX_INFO; 		break; }
+		case SC_LOG_LEVEL_WARNING: 	 { prefix = SC_LOG_PREFIX_WARNING; 		break; }
+		case SC_LOG_LEVEL_CRITICAL:  { prefix = SC_LOG_PREFIX_CRITICAL; 	break; }
+		case SC_LOG_LEVEL_ERROR: 	 { prefix = SC_LOG_PREFIX_ERROR; 		break; }
+		default:	 				 { prefix = SC_LOG_PREFIX_INFO; 		break; }
 	};
 	
    	(void)vsnprintf(buffer, sizeof(buffer), format, arg_list);
 	fprintf(stderr, "%s %s", prefix, buffer);
-	if(status != CL_SUCCESS)
+	if(status != SC_SUCCESS)
 	{
-		error = ceGetErrorString(status);
+		error = scGetErrorString(status);
 		fprintf(stderr, "%s %s", prefix, error);
 	}
 	fflush(stderr);
     
-	if(level == CE_LOG_LEVEL_CRITICAL)
+	if(level == SC_LOG_LEVEL_CRITICAL)
 	{
-#if defined(CE_PLATFORM_WINDOWS)
+#if defined(SC_PLATFORM_WINDOWS)
 		__debugbreak();
 #else
 		abort();
 #endif
 	}
-    return CL_SUCCESS;
+    return SC_SUCCESS;
 }
 
 
 /**************************************************************************************************/
 
-cl_int
-ceEnableLogging(
-	ce_session session, cl_bitfield flags, const char* filename)
+sc_status
+scEnableLogging(
+	sc_session session, sc_bitfield flags, const char* filename)
 {
-	cl_int status;
-	ce_session_t* s = (ce_session_t*)session;
-	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
-	if(s == NULL || log == NULL)
-		return CL_INVALID_VALUE;
+	sc_status status;
+	sc_logging_info handle = scGetLoggingInfo(session, &status);
+	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
+	if(log == NULL)
+		return SC_INVALID_VALUE;
 	
 	log->flags = flags;
 	
@@ -214,180 +224,182 @@ ceEnableLogging(
 	return status;
 }
 
-cl_int
-ceDisableLogging(
-	ce_session session)
+sc_status
+scDisableLogging(
+	sc_session session)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
-	if(s == NULL || log == NULL)
-		return CL_INVALID_VALUE;
+	sc_status status;
+	sc_logging_info handle = scGetLoggingInfo(session, &status);
+	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
+	if(log == NULL)
+		return SC_INVALID_VALUE;
 	
 	CloseLogFile(log);
 	
 	if(log->filename)
 	{
-		ceDeallocate(session, log->filename);
+		scDeallocate(session, log->filename);
 		log->filename = NULL;
 	}
 	
 	return 0;
 }
 
-cl_int 
-ceSetLoggingMode(
-	ce_session session, cl_bitfield flags, const char* filename)
+sc_status 
+scSetLoggingMode(
+	sc_session session, sc_bitfield flags, const char* filename)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
-	if(s == NULL || log == NULL)
-		return CL_INVALID_VALUE;
+	sc_status status;
+	sc_logging_info handle = scGetLoggingInfo(session, &status);
+	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
+	if(log == NULL)
+		return SC_INVALID_VALUE;
 		
-	cl_bool append = log->flags & CE_LOG_APPEND;
+	sc_bool append = log->flags & SC_LOG_APPEND;
 	
 	log->flags = flags;
 	
-	if(log->filename != filename || (log->flags & CE_LOG_APPEND) != append)
+	if(log->filename != filename || (log->flags & SC_LOG_APPEND) != append)
 		return OpenLogFile(log, filename);
 	
-	return CL_SUCCESS;
+	return SC_SUCCESS;
 }
 
-cl_int 
-ceDebug(
-	ce_session session, const char* format, ...)
+sc_status 
+scDebug(
+	sc_session session, const char* format, ...)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
-
-    cl_int status;
-    va_list arg_list;
-    va_start(arg_list, format);
-	if(s == NULL || log == NULL)
-	{
-	    status = SystemLogHandler(CE_LOG_LEVEL_DEBUG, 0, format, arg_list);
-	}
-	else
-	{
-	    status = LogHandler(log, CE_LOG_LEVEL_DEBUG, 0, format, arg_list);
-    }
-    va_end(arg_list);
-    return status;
-}
-
-cl_int 
-ceTest(
-	ce_session session, const char* format, ...)
-{
-	ce_session_t* s = (ce_session_t*)session;
-	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
-
-    cl_int status;
-    va_list arg_list;
-    va_start(arg_list, format);
-	if(s == NULL || log == NULL)
-	{
-	    status = SystemLogHandler(CE_LOG_LEVEL_TEST, 0, format, arg_list);
-	}
-	else
-	{
-	    status = LogHandler(log, CE_LOG_LEVEL_TEST, 0, format, arg_list);
-    }
-    va_end(arg_list);
-    return status;
-}
-
-cl_int 
-ceInfo(
-	ce_session session, const char* format, ...)
-{
-	ce_session_t* s = (ce_session_t*)session;
-	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
-
-    cl_int status;
-    va_list arg_list;
-    va_start(arg_list, format);
-	if(s == NULL || log == NULL)
-	{
-	    status = SystemLogHandler(CE_LOG_LEVEL_INFO, 0, format, arg_list);
-	}
-	else
-	{
-	    status = LogHandler(log, CE_LOG_LEVEL_INFO, 0, format, arg_list);
-    }
-    va_end(arg_list);
-    return status;
-}
-
-cl_int 
-ceWarning(
-	ce_session session, const char* format, ...)
-{
-	ce_session_t* s = (ce_session_t*)session;
-	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
+	sc_status status;
+	sc_logging_info handle = scGetLoggingInfo(session, &status);
+	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
 	
-	cl_int status;
     va_list arg_list;
     va_start(arg_list, format);
-	if(s == NULL || log == NULL)
+	if(session == NULL || log == NULL)
 	{
-	    status = SystemLogHandler(CE_LOG_LEVEL_WARNING, 0, format, arg_list);
+	    status = SystemLogHandler(SC_LOG_LEVEL_DEBUG, 0, format, arg_list);
 	}
 	else
 	{
-	    status = LogHandler(log, CE_LOG_LEVEL_WARNING, 0, format, arg_list);
+	    status = LogHandler(log, SC_LOG_LEVEL_DEBUG, 0, format, arg_list);
     }
     va_end(arg_list);
     return status;
 }
 
-cl_int 
-ceCritical(
-	ce_session session, const char* format, ...)
+sc_status 
+scTest(
+	sc_session session, const char* format, ...)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
+	sc_status status;
+	sc_logging_info handle = scGetLoggingInfo(session, &status);
+	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
+
+    va_list arg_list;
+    va_start(arg_list, format);
+	if(session == NULL || log == NULL)
+	{
+	    status = SystemLogHandler(SC_LOG_LEVEL_TEST, 0, format, arg_list);
+	}
+	else
+	{
+	    status = LogHandler(log, SC_LOG_LEVEL_TEST, 0, format, arg_list);
+    }
+    va_end(arg_list);
+    return status;
+}
+
+sc_status 
+scInfo(
+	sc_session session, const char* format, ...)
+{
+	sc_status status;
+	sc_logging_info handle = scGetLoggingInfo(session, &status);
+	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
+
+    va_list arg_list;
+    va_start(arg_list, format);
+	if(session == NULL || log == NULL)
+	{
+	    status = SystemLogHandler(SC_LOG_LEVEL_INFO, 0, format, arg_list);
+	}
+	else
+	{
+	    status = LogHandler(log, SC_LOG_LEVEL_INFO, 0, format, arg_list);
+    }
+    va_end(arg_list);
+    return status;
+}
+
+sc_status 
+scWarning(
+	sc_session session, const char* format, ...)
+{
+	sc_status status;
+	sc_logging_info handle = scGetLoggingInfo(session, &status);
+	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
 	
-	cl_int status;
     va_list arg_list;
     va_start(arg_list, format);
-	if(s == NULL || log == NULL)
+	if(session == NULL || log == NULL)
 	{
-	    status = SystemLogHandler(CE_LOG_LEVEL_CRITICAL, 0, format, arg_list);
+	    status = SystemLogHandler(SC_LOG_LEVEL_WARNING, 0, format, arg_list);
 	}
 	else
 	{
-	    status = LogHandler(log, CE_LOG_LEVEL_CRITICAL, 0, format, arg_list);
+	    status = LogHandler(log, SC_LOG_LEVEL_WARNING, 0, format, arg_list);
     }
     va_end(arg_list);
     return status;
 }
 
-cl_int 
-ceError(
-	ce_session session, cl_int error, const char* format, ...)
+sc_status 
+scCritical(
+	sc_session session, const char* format, ...)
 {
-	ce_session_t* s = (ce_session_t*)session;
-	ce_logging_info_t* log = s ? (ce_logging_info_t*)s->logging : 0;
+	sc_status status;
+	sc_logging_info handle = scGetLoggingInfo(session, &status);
+	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
 
-	cl_int status;
     va_list arg_list;
     va_start(arg_list, format);
-	if(s == NULL || log == NULL)
+	if(session == NULL || log == NULL)
 	{
-	    status = SystemLogHandler(CE_LOG_LEVEL_ERROR, error, format, arg_list);
+	    status = SystemLogHandler(SC_LOG_LEVEL_CRITICAL, 0, format, arg_list);
 	}
 	else
 	{
-	    status = LogHandler(log, CE_LOG_LEVEL_ERROR, error, format, arg_list);
+	    status = LogHandler(log, SC_LOG_LEVEL_CRITICAL, 0, format, arg_list);
+    }
+    va_end(arg_list);
+    return status;
+}
+
+sc_status 
+scError(
+	sc_session session, sc_int error, const char* format, ...)
+{
+	sc_status status;
+	sc_logging_info handle = scGetLoggingInfo(session, &status);
+	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
+
+    va_list arg_list;
+    va_start(arg_list, format);
+	if(session == NULL || log == NULL)
+	{
+	    status = SystemLogHandler(SC_LOG_LEVEL_ERROR, error, format, arg_list);
+	}
+	else
+	{
+	    status = LogHandler(log, SC_LOG_LEVEL_ERROR, error, format, arg_list);
 	}
     va_end(arg_list);
 	return status;
 }
 
 const char * 
-ceGetErrorString(
-	cl_int status)
+scGetErrorString(
+	sc_status status)
 {
     const char* error_string = 0;
 

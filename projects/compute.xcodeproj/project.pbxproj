@@ -22,6 +22,7 @@
 		C32A847611145A6A004AD8CC /* session.h in Headers */ = {isa = PBXBuildFile; fileRef = C32A846E11145A6A004AD8CC /* session.h */; };
 		C32A847711145A6A004AD8CC /* symbol.h in Headers */ = {isa = PBXBuildFile; fileRef = C32A846F11145A6A004AD8CC /* symbol.h */; };
 		C32A848111145B47004AD8CC /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C32A848011145B47004AD8CC /* OpenCL.framework */; };
+		C3456ABE111FB96F009CE051 /* libcompute.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC0630554660B00DB518D /* libcompute.dylib */; };
 		C3AE4A89111AAA9C000AE6F6 /* options.c in Sources */ = {isa = PBXBuildFile; fileRef = C3AE4A87111AAA9C000AE6F6 /* options.c */; };
 		C3AE4A8A111AAA9C000AE6F6 /* stack.c in Sources */ = {isa = PBXBuildFile; fileRef = C3AE4A88111AAA9C000AE6F6 /* stack.c */; };
 		C3AE4A8F111AAAA9000AE6F6 /* atomics.h in Headers */ = {isa = PBXBuildFile; fileRef = C3AE4A8B111AAAA9000AE6F6 /* atomics.h */; };
@@ -67,7 +68,7 @@
 		C3AE4AF8111BAF06000AE6F6 /* values.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = values.h; sourceTree = "<group>"; };
 		C3AE4B05111BAFA8000AE6F6 /* options */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = options; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3AE4B09111BAFC6000AE6F6 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../tests/options/main.c; sourceTree = SOURCE_ROOT; };
-		C3BA2B2F111BCB8F0011F3F7 /* session */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = session; path = ../../../../build/Debug/session; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3BA2B2F111BCB8F0011F3F7 /* session */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = session; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3BA2B33111BCBA50011F3F7 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = main.c; path = ../tests/session/main.c; sourceTree = SOURCE_ROOT; };
 		C3BA2B42111BCBCD0011F3F7 /* status.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = status.h; sourceTree = "<group>"; };
 		C3BA2B44111BCBE40011F3F7 /* device.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = device.h; sourceTree = "<group>"; };
@@ -89,6 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3456ABE111FB96F009CE051 /* libcompute.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

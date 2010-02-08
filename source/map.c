@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmanext <derek.gerstmanext[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -37,57 +37,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-typedef unsigned short ce_map_index_t;
+typedef unsigned short sc_map_index_t;
 
-typedef struct _ce_map_node_t {
-    struct _ce_map_node_t* 	next; 
-    ce_symbol 					key;
-    ce_reference				item;
-} ce_map_node_t;
+typedef struct _sc_map_node_t {
+    struct _sc_map_node_t* 	next; 
+    sc_symbol 					key;
+    sc_reference				item;
+} sc_map_node_t;
 
-typedef struct _ce_map_t {
-	ce_session					session;
-	ce_map_node_t** 			bins;
-	ce_map_index_t 				size;
-} ce_map_t;
-
-/**************************************************************************************************/
-
-#define ceMapCompare(a,b) ((a) && (b) && ((a) == (b)))
+typedef struct _sc_map_t {
+	sc_session					session;
+	sc_map_node_t** 			bins;
+	sc_map_index_t 				size;
+} sc_map_t;
 
 /**************************************************************************************************/
 
-ce_map
-ceCreateMap(
-	ce_session session, size_t size)
+#define scMapCompare(a,b) ((a) && (b) && ((a) == (b)))
+
+/**************************************************************************************************/
+
+sc_map
+scCreateMap(
+	sc_session session, size_t size)
 {
-	ce_map_t *map;
+	sc_map_t *map;
 	size_t bytes;
 	
-	map = ceAllocate(session, sizeof(ce_map_t));
+	map = scAllocate(session, sizeof(sc_map_t));
 	map->size = 0;
 	
-	bytes = size * sizeof(ce_map_node_t *);
-	map->bins = ceAllocate(session, bytes);
+	bytes = size * sizeof(sc_map_node_t *);
+	map->bins = scAllocate(session, bytes);
 	if(!map->bins)
 		return 0;
     
     memset(map->bins, 0, bytes);
     map->size = size;
     map->session = session;
-	return (ce_map)map;
+	return (sc_map)map;
 }
 
 void
-ceReleaseMap(
-	ce_map handle)
+scReleaseMap(
+	sc_map handle)
 {
-    ce_map_node_t *node = NULL;
-    ce_map_node_t *next = NULL;
-    ce_map_index_t index = 0;
+    sc_map_node_t *node = NULL;
+    sc_map_node_t *next = NULL;
+    sc_map_index_t index = 0;
 
-	ce_map_t* map = (ce_map_t*)handle;
-	ce_session session = map->session;
+	sc_map_t* map = (sc_map_t*)handle;
+	sc_session session = map->session;
 	
 	while(index < map->size)
 	{
@@ -96,33 +96,33 @@ ceReleaseMap(
 		{
 			next = node;
 			if(next)
-				ceDeallocate(session, next);
+				scDeallocate(session, next);
 			node = node->next;
 		}
     }
 	
-	ceDeallocate(session, map->bins);
-	ceDeallocate(session, map);
+	scDeallocate(session, map->bins);
+	scDeallocate(session, map);
 }
 
 cl_int
-ceMapInsert(
-	ce_map handle, 
-	ce_symbol key, 
-	ce_reference item)
+scMapInsert(
+	sc_map handle, 
+	sc_symbol key, 
+	sc_reference item)
 {
-    ce_map_node_t *node = NULL;
-    ce_map_node_t *next = NULL;
-    ce_map_index_t index = 0;
+    sc_map_node_t *node = NULL;
+    sc_map_node_t *next = NULL;
+    sc_map_index_t index = 0;
 
-	ce_map_t* map = (ce_map_t*)handle;
+	sc_map_t* map = (sc_map_t*)handle;
 	
-	index = ceGetSymbolHash(key) % map->size;
+	index = scGetSymbolHash(key) % map->size;
 
-    if ((node = ceAllocate(map->session, sizeof(ce_map_node_t))) == 0) 
+    if ((node = scAllocate(map->session, sizeof(sc_map_node_t))) == 0) 
     	return 0;
 
-    ceRetain(map->session, item);
+    scRetain(map->session, item);
 
     next = map->bins[index];
     map->bins[index] = node;
@@ -133,22 +133,22 @@ ceMapInsert(
     return CL_SUCCESS;
 }
 
-ce_reference 
-ceMapRemove(
-	ce_map handle, 
-	ce_symbol key)
+sc_reference 
+scMapRemove(
+	sc_map handle, 
+	sc_symbol key)
 {
-    ce_map_node_t *node = NULL;
-    ce_map_node_t *next = NULL;
-    ce_map_index_t index = 0;
-    ce_reference item = NULL;
+    sc_map_node_t *node = NULL;
+    sc_map_node_t *next = NULL;
+    sc_map_index_t index = 0;
+    sc_reference item = NULL;
 
-	ce_map_t* map = (ce_map_t*)handle;
+	sc_map_t* map = (sc_map_t*)handle;
 	
-    index = ceGetSymbolHash(key) % map->size;
+    index = scGetSymbolHash(key) % map->size;
     node = map->bins[index];
 
-    while (node && !ceMapCompare(node->key, key)) {
+    while (node && !scMapCompare(node->key, key)) {
         next = node;
         node = node->next;
     }
@@ -163,26 +163,26 @@ ceMapRemove(
         map->bins[index] = node->next;
 
 	item = node->item;
-	ceRelease(map->session, node->item);
-	ceReleaseSymbol(node->key);
-    ceDeallocate(map->session, node);
+	scRelease(map->session, node->item);
+	scReleaseSymbol(node->key);
+    scDeallocate(map->session, node);
     return item;
 }
 
-ce_reference
-ceGetMapItem(
-	ce_map handle, 
-	ce_symbol key)
+sc_reference
+scGetMapItem(
+	sc_map handle, 
+	sc_symbol key)
 {
-    ce_map_node_t *node = NULL;
-    ce_map_index_t index = 0;
+    sc_map_node_t *node = NULL;
+    sc_map_index_t index = 0;
 
-	ce_map_t* map = (ce_map_t*)handle;
+	sc_map_t* map = (sc_map_t*)handle;
 
-	index = ceGetSymbolHash(key) % map->size;
+	index = scGetSymbolHash(key) % map->size;
     node = map->bins[index];
 
-    while (node && !ceMapCompare(node->key, key)) 
+    while (node && !scMapCompare(node->key, key)) 
     {
 		if(node && node->item)
 		{

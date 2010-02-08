@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -37,57 +37,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**************************************************************************************************/
 
 const char*
-ceGetStatusString(
-	ce_status value, ce_status *status)
+scGetStatusString(
+	sc_status value, sc_status *status)
 {
 
 	if(status)
-		(*status) = CE_SUCCESS;
+		(*status) = SC_SUCCESS;
 
 	switch(value)
 	{
-		case CE_SUCCESS:					return "success";
-		case CE_INVALID_TYPE:				return "invalid type";
-		case CE_INVALID_DATA:				return "invalid data";
-		case CE_INVALID_VALUE:				return "invalid value";
-		case CE_INVALID_REFERENCE:			return "invalid reference";
-		case CE_INVALID_SYMBOL:				return "invalid symbol";
-		case CE_INVALID_STACK:				return "invalid stack";
-		case CE_INVALID_QUEUE:				return "invalid queue";
-		case CE_INVALID_MAP:				return "invalid map";
-		case CE_INVALID_LOG:				return "invalid log";
-		case CE_INVALID_SESSION:			return "invalid session";
-		case CE_INVALID_CONTEXT:			return "invalid context";
-		case CE_INVALID_HOST:				return "invalid host";
-		case CE_INVALID_MEMORY_INFO:		return "invalid memory info";
-		case CE_INVALID_LOGGING_INFO:		return "invalid logging info";
-		case CE_INVALID_PROFILING_INFO:		return "invalid profiling info";
-		case CE_OUT_OF_HOST_MEMORY:			return "out of host memory";
-		case CE_TYPE_MISMATCH:				return "type mismatch";
-		case CE_SIZE_MISMATCH:				return "size mismatch";
-		case CE_INVALID_STATUS:				return "invalid status";
+		case SC_SUCCESS:					return "success";
+		case SC_INVALID_TYPE:				return "invalid type";
+		case SC_INVALID_DATA:				return "invalid data";
+		case SC_INVALID_VALUE:				return "invalid value";
+		case SC_INVALID_REFERENCE:			return "invalid reference";
+		case SC_INVALID_SYMBOL:				return "invalid symbol";
+		case SC_INVALID_STACK:				return "invalid stack";
+		case SC_INVALID_QUEUE:				return "invalid queue";
+		case SC_INVALID_MAP:				return "invalid map";
+		case SC_INVALID_LOG:				return "invalid log";
+		case SC_INVALID_LOG_FILE:			return "invalid log file";
+		case SC_INVALID_SESSION:			return "invalid session";
+		case SC_INVALID_CONTEXT:			return "invalid context";
+		case SC_INVALID_HOST:				return "invalid host";
+		case SC_INVALID_DEVICE:				return "invalid device";
+		case SC_INVALID_DEVICE_TYPE:		return "invalid device type";
+		case SC_INVALID_DEVICE_INFO:		return "invalid device info";
+		case SC_INVALID_COMMAND_QUEUE:		return "invalid command queue";
+		case SC_INVALID_MEMORY_INFO:		return "invalid memory info";
+		case SC_INVALID_LOGGING_INFO:		return "invalid logging info";
+		case SC_INVALID_PROFILING_INFO:		return "invalid profiling info";
+		case SC_DEVICE_NOT_AVAILABLE:		return "device not available";
+		case SC_OUT_OF_HOST_MEMORY:			return "out of host memory";
+		case SC_TYPE_MISMATCH:				return "type mismatch";
+		case SC_SIZE_MISMATCH:				return "size mismatch";
+		case SC_INVALID_STATUS:				return "invalid status";
 		default:
 		{
 			if(status)
-				(*status) = CE_INVALID_STATUS;
+				(*status) = SC_INVALID_STATUS;
 			
 			return "unknown status";
 		}
 	};
 
 	if(status)
-		(*status) = CE_INVALID_STATUS;
+		(*status) = SC_INVALID_STATUS;
 	
 	return "unknown";
 }
 
-ce_bool
-ceIsError(
-	ce_status value)
+sc_bool
+scIsError(
+	sc_status value)
 {
-	if(value == CE_SUCCESS)
-		return CE_FALSE;
-	return CE_TRUE;
+	if(value == SC_SUCCESS)
+		return SC_FALSE;
+	return SC_TRUE;
 }
 
 /**************************************************************************************************/

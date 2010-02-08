@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,62 +32,62 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_LOGGING_H__
-#define __CE_LOGGING_H__
+#ifndef __SC_LOGGING_H__
+#define __SC_LOGGING_H__
  
 #include "compute.h"
  
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-#define CE_LOG_NONE										(1 << 0)
-#define CE_LOG_FILE					                	(1 << 1)
-#define CE_LOG_CONSOLE                            		(1 << 2)
-#define CE_LOG_ALL                         				(1 << 3)
-#define CE_LOG_REPLACE                    				(1 << 4)
-#define CE_LOG_APPEND                        			(1 << 5)
+#define SC_LOG_NONE										(1 << 0)
+#define SC_LOG_FILE					                	(1 << 1)
+#define SC_LOG_CONSOLE                            		(1 << 2)
+#define SC_LOG_ALL                         				(1 << 3)
+#define SC_LOG_REPLACE                    				(1 << 4)
+#define SC_LOG_APPEND                        			(1 << 5)
 
-#define CE_LOG_SRC_INFO									"file %s, line %i\n\n" , __FILE__ , __LINE__
-#define CE_DEFAULT_LOG_FILENAME 						"ce_session.log"
-#define CE_LOG_SEPARATOR "------------------------------------------------------------------------"
-
-/**************************************************************************************************/
-
-extern CE_API_EXPORT cl_int
-ceEnableLogging(ce_session session, cl_bitfield flags, const char* filename);
-
-extern CE_API_EXPORT cl_int
-ceDisableLogging(ce_session session);
-
-extern CE_API_EXPORT cl_int 
-ceSetLoggingMode(ce_session session, cl_bitfield flags,  const char* filename);
-
-extern CE_API_EXPORT cl_int 
-ceTest(ce_session session, const char* format, ...);
-
-extern CE_API_EXPORT cl_int 
-ceDebug(ce_session session, const char* format, ...);
-
-extern CE_API_EXPORT cl_int 
-ceWarning(ce_session session, const char* format, ...);
-
-extern CE_API_EXPORT cl_int 
-ceInfo(ce_session session, const char* format, ...);
-
-extern CE_API_EXPORT cl_int 
-ceCritical(ce_session session, const char* format, ...);
-
-extern CE_API_EXPORT cl_int 
-ceError(ce_session session, cl_int status, const char* format, ...);
-
-extern CE_API_EXPORT const char* 
-ceGetErrorString(cl_int status);
+#define SC_LOG_SRC_INFO									"file %s, line %i\n\n" , __FILE__ , __LINE__
+#define SC_DEFAULT_LOG_FILENAME 						"sc_session.log"
+#define SC_LOG_SEPARATOR "------------------------------------------------------------------------"
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
+extern SC_API_EXPORT sc_status
+scEnableLogging(sc_session session, sc_bitfield flags, const char* filename);
 
-#endif	/* __CE_LOG_H__ */
+extern SC_API_EXPORT sc_status
+scDisableLogging(sc_session session);
+
+extern SC_API_EXPORT sc_status 
+scSetLoggingMode(sc_session session, sc_bitfield flags,  const char* filename);
+
+extern SC_API_EXPORT sc_status 
+scTest(sc_session session, const char* format, ...);
+
+extern SC_API_EXPORT sc_status 
+scDebug(sc_session session, const char* format, ...);
+
+extern SC_API_EXPORT sc_status 
+scWarning(sc_session session, const char* format, ...);
+
+extern SC_API_EXPORT sc_status 
+scInfo(sc_session session, const char* format, ...);
+
+extern SC_API_EXPORT sc_status 
+scCritical(sc_session session, const char* format, ...);
+
+extern SC_API_EXPORT sc_status 
+scError(sc_session session, cl_int status, const char* format, ...);
+
+extern SC_API_EXPORT const char* 
+scGetErrorString(sc_status status);
+
+/**************************************************************************************************/
+
+SC_EXTERN_C_END
+
+#endif	/* __SC_LOG_H__ */

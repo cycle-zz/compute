@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -37,85 +37,85 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-typedef struct _ce_stack_node_t {
-  struct _ce_stack_node_t*		next; 
-  ce_reference	 				item;
-  ce_reference	 				reference;
-} ce_stack_node_t;
+typedef struct _sc_stack_node_t {
+  struct _sc_stack_node_t*		next; 
+  sc_reference	 				item;
+  sc_reference	 				reference;
+} sc_stack_node_t;
 
-typedef struct _ce_stack_t {
-	ce_stack_node_t*			head;
-	ce_session					session;
-} ce_stack_t;
+typedef struct _sc_stack_t {
+	sc_stack_node_t*			head;
+	sc_session					session;
+} sc_stack_t;
 
 /**************************************************************************************************/
 
-static ce_stack_node_t* 
+static sc_stack_node_t* 
 CreateStackNode(
-	ce_session session,
-	ce_reference item)
+	sc_session session,
+	sc_reference item)
 {
-	ce_stack_node_t* node = ceAllocate(session, sizeof(ce_stack_node_t));
-	memset(node, 0, sizeof(ce_stack_node_t));
-	node->reference = ceCreateReference(session, node);
+	sc_stack_node_t* node = scAllocate(session, sizeof(sc_stack_node_t));
+	memset(node, 0, sizeof(sc_stack_node_t));
+	node->reference = scCreateReference(session, node);
 	node->item = item;
 	return node;
 }
 
-ce_stack 
-ceCreateStack(
-	ce_session session)
+sc_stack 
+scCreateStack(
+	sc_session session)
 {
-	ce_stack_t* stack = ceAllocate(session, sizeof(ce_stack_t));
-	memset(stack, 0, sizeof(ce_stack_t));
+	sc_stack_t* stack = scAllocate(session, sizeof(sc_stack_t));
+	memset(stack, 0, sizeof(sc_stack_t));
 	
 	stack->session = session;
 	stack->head = CreateStackNode(session, NULL);
-	return (ce_stack)stack;
+	return (sc_stack)stack;
 }
 
-ce_status
-ceReleaseStack(
-   ce_stack handle)
+sc_status
+scReleaseStack(
+   sc_stack handle)
 {
-	ce_uint count = 0;
-	ce_stack_t* stack = (ce_stack_t*)(handle);
+	sc_uint count = 0;
+	sc_stack_t* stack = (sc_stack_t*)(handle);
 
 	while(cePopStack(handle) != NULL) { count++; }
 
-	return ceDeallocate(stack->session, stack);
+	return scDeallocate(stack->session, stack);
 }
 
 void 
 cePushStack(
-	ce_stack handle,
-	ce_reference item)
+	sc_stack handle,
+	sc_reference item)
 {
-	ce_stack_t* stack = (ce_stack_t*)(handle);
-	ce_stack_node_t* node = CreateStackNode((ce_session)stack->session, item);
+	sc_stack_t* stack = (sc_stack_t*)(handle);
+	sc_stack_node_t* node = CreateStackNode((sc_session)stack->session, item);
 	do {
 		node = stack->head->next;
 	}
-	while( !ceAtomicCompareAndSwapPtr((void**)&(stack->head->next), node->next, node) ); 
+	while( !scAtomicCompareAndSwapPtr((void**)&(stack->head->next), node->next, node) ); 
 }
 
-ce_reference 
+sc_reference 
 cePopStack(
-	ce_stack handle)
+	sc_stack handle)
 {
-	ce_stack_t* stack = (ce_stack_t*)(handle);
-	ce_stack_node_t* node = NULL;
-	ce_reference item = NULL;
+	sc_stack_t* stack = (sc_stack_t*)(handle);
+	sc_stack_node_t* node = NULL;
+	sc_reference item = NULL;
 	
 	do {
 		node = stack->head->next;
 		if(node == NULL) 
 			return item;
 	} 
-	while( !ceAtomicCompareAndSwapPtr((void**)&(stack->head->next), node, node->next) ); 
+	while( !scAtomicCompareAndSwapPtr((void**)&(stack->head->next), node, node->next) ); 
 	
 	item = node->item;
-	ceRelease(stack->session, node->reference);	
+	scRelease(stack->session, node->reference);	
 	return item;
 }
 

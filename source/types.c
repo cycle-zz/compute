@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -38,50 +38,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**************************************************************************************************/
 
 const char*
-ceGetTypeString(ce_type type, ce_uint* status)
+scGetTypeString(sc_type type, sc_uint* status)
 {
 	if(status)
-		(*status) = CE_SUCCESS;
+		(*status) = SC_SUCCESS;
 	
 	switch(type)
 	{
-		case CE_TYPE_INVALID: 				return "ce_invalid";
-		case CE_TYPE_BOOL: 					return "ce_bool";
-		case CE_TYPE_CHAR: 					return "ce_char";
-		case CE_TYPE_UCHAR: 				return "ce_uchar";
-		case CE_TYPE_SHORT: 				return "ce_short";
-		case CE_TYPE_USHORT: 				return "ce_ushort";
-		case CE_TYPE_INT: 					return "ce_int";
-		case CE_TYPE_UINT: 					return "ce_uint";
-		case CE_TYPE_LONG: 					return "ce_long";
-		case CE_TYPE_ULONG: 				return "ce_ulong";
-		case CE_TYPE_FLOAT: 				return "ce_float";
-		case CE_TYPE_DOUBLE: 				return "ce_double";
-		case CE_TYPE_SYMBOL: 				return "ce_symbol";
-		case CE_TYPE_QUEUE: 				return "ce_queue";
-		case CE_TYPE_STACK: 				return "ce_stack";
-		case CE_TYPE_MAP: 					return "ce_map";
-		case CE_TYPE_REFERENCE: 			return "ce_reference";
-		case CE_TYPE_DEVICE: 				return "ce_device";
-		case CE_TYPE_MEM: 					return "ce_mem";
-		case CE_TYPE_PROGRAM: 				return "ce_program";
-		case CE_TYPE_KERNEL: 				return "ce_kernel";
-		case CE_TYPE_LOG: 					return "ce_log";
-		case CE_TYPE_MEMORY_INFO: 			return "ce_memory_info";
-		case CE_TYPE_LOGGING_INFO: 			return "ce_logging_info";
-		case CE_TYPE_PROFILING_INFO: 		return "ce_profiling_info";
-		case CE_TYPE_UNKNOWN:
+		case SC_TYPE_INVALID: 				return "sc_invalid";
+		case SC_TYPE_BOOL: 					return "sc_bool";
+		case SC_TYPE_CHAR: 					return "sc_char";
+		case SC_TYPE_UCHAR: 				return "sc_uchar";
+		case SC_TYPE_SHORT: 				return "sc_short";
+		case SC_TYPE_USHORT: 				return "sc_ushort";
+		case SC_TYPE_INT: 					return "sc_int";
+		case SC_TYPE_UINT: 					return "sc_uint";
+		case SC_TYPE_LONG: 					return "sc_long";
+		case SC_TYPE_ULONG: 				return "sc_ulong";
+		case SC_TYPE_FLOAT: 				return "sc_float";
+		case SC_TYPE_DOUBLE: 				return "sc_double";
+		case SC_TYPE_SYMBOL: 				return "sc_symbol";
+		case SC_TYPE_QUEUE: 				return "sc_queue";
+		case SC_TYPE_STACK: 				return "sc_stack";
+		case SC_TYPE_MAP: 					return "sc_map";
+		case SC_TYPE_REFERENCE: 			return "sc_reference";
+		case SC_TYPE_DEVICE: 				return "sc_device";
+		case SC_TYPE_MEM: 					return "sc_mem";
+		case SC_TYPE_PROGRAM: 				return "sc_program";
+		case SC_TYPE_KERNEL: 				return "sc_kernel";
+		case SC_TYPE_LOG: 					return "sc_log";
+		case SC_TYPE_MEMORY_INFO: 			return "sc_memory_info";
+		case SC_TYPE_LOGGING_INFO: 			return "sc_logging_info";
+		case SC_TYPE_PROFILING_INFO: 		return "sc_profiling_info";
+		case SC_TYPE_UNKNOWN:
 		default:
 		{
 			if(status)
-				(*status) = CE_INVALID_TYPE;
+				(*status) = SC_INVALID_TYPE;
 		
 			return "unknown type";
 		}
 	};
 
 	if(status)
-		(*status) = CE_INVALID_TYPE;
+		(*status) = SC_INVALID_TYPE;
 	
 	return "unknown type";
 }

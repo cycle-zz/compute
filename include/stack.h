@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_STACK_H__
-#define __CE_STACK_H__
+#ifndef __SC_STACK_H__
+#define __SC_STACK_H__
 
 /**************************************************************************************************/
 
@@ -41,26 +41,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-extern CE_API_EXPORT ce_stack 
-ceCreateStack(ce_session session);
+extern SC_API_EXPORT sc_stack 
+scCreateStack(sc_session session);
 
-extern CE_API_EXPORT ce_status 
-ceReleaseStack(ce_stack stack);
+extern SC_API_EXPORT sc_status 
+scReleaseStack(sc_stack stack);
 
-extern CE_API_EXPORT void
-cePushStack(ce_stack stack, ce_reference item);
+extern SC_API_EXPORT void
+cePushStack(sc_stack stack, sc_reference item);
 
-extern CE_API_EXPORT ce_reference
-cePopStack(ce_stack stack);
-
-/**************************************************************************************************/
-
-CE_EXTERN_C_BEGIN
+extern SC_API_EXPORT sc_reference
+cePopStack(sc_stack stack);
 
 /**************************************************************************************************/
 
-#endif /* __CE_STACK_H__ */
+SC_EXTERN_C_BEGIN
+
+/**************************************************************************************************/
+
+#endif /* __SC_STACK_H__ */

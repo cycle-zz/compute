@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_DEVICE_H__
-#define __CE_DEVICE_H__
+#ifndef __SC_DEVICE_H__
+#define __SC_DEVICE_H__
 
 /**************************************************************************************************/
 
@@ -43,18 +43,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
+
+/* Device Type Enumeration ************************************************************************/
+
+typedef enum _sc_device_type {
+	SC_DEVICE_TYPE_INVALID	= 0,
+	SC_DEVICE_TYPE_DEFAULT,
+	SC_DEVICE_TYPE_ALL,
+	SC_DEVICE_TYPE_CPU,
+	SC_DEVICE_TYPE_GPU,
+	SC_DEVICE_TYPE_ACCELERATOR,
+	SC_DEVICE_TYPE_UNKNOWN
+} sc_device_type;
 
 /* Device Methods *********************************************************************************/
 
-extern CE_API_EXPORT const char*
-ceGetDeviceTypeString(ce_device_type type, ce_status* status);
+extern SC_API_EXPORT const char*
+scGetDeviceTypeString(sc_device_type type, sc_status* status);
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
+SC_EXTERN_C_END
 
 /**************************************************************************************************/
 
-#endif /* __CE_STATUS_H__ */
+#endif /* __SC_STATUS_H__ */
 

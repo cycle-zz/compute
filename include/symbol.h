@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_SYMBOL_H__
-#define __CE_SYMBOL_H__
+#ifndef __SC_SYMBOL_H__
+#define __SC_SYMBOL_H__
 
 /**************************************************************************************************/
 
@@ -41,33 +41,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-extern CE_API_EXPORT ce_symbol
-ceCreateSymbol(ce_session session, const char* name, size_t length);
+extern SC_API_EXPORT sc_symbol
+scCreateSymbol(sc_session session, const char* name, size_t length);
 
-extern CE_API_EXPORT ce_symbol
-ceCreateSymbolFromValue(ce_session session, ce_value handle, ce_status* status);
+extern SC_API_EXPORT sc_symbol
+scCreateSymbolFromValue(sc_session session, sc_value handle, sc_status* status);
 
-extern CE_API_EXPORT void 
-ceReleaseSymbol(ce_symbol symbol);
+extern SC_API_EXPORT void 
+scReleaseSymbol(sc_symbol symbol);
 
-extern CE_API_EXPORT const char*
-ceGetSymbolName(ce_symbol symbol);
+extern SC_API_EXPORT const char*
+scGetSymbolName(sc_symbol symbol);
 
-extern CE_API_EXPORT ce_bool
-ceIsSymbolNameEqual(ce_symbol a, ce_symbol b);
+extern SC_API_EXPORT sc_bool
+scIsSymbolNameEqual(sc_symbol a, sc_symbol b);
 
-extern CE_API_EXPORT ce_uint
-ceGetSymbolHash(ce_symbol symbol);
+extern SC_API_EXPORT sc_uint
+scGetSymbolHash(sc_symbol symbol);
 
-extern CE_API_EXPORT size_t
-ceGetSymbolLength(ce_symbol symbol);
+extern SC_API_EXPORT size_t
+scGetSymbolLength(sc_symbol symbol);
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
+SC_EXTERN_C_END
 
-#endif /* __CE_SYMBOL_H__ */
+#endif /* __SC_SYMBOL_H__ */

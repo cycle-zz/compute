@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_PROFILING_H__
-#define __CE_PROFILING_H__
+#ifndef __SC_PROFILING_H__
+#define __SC_PROFILING_H__
 
 /**************************************************************************************************/
 
@@ -41,92 +41,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-#if defined(CE_PLATFORM_WINDOWS)
-	/* Windows */
-	typedef LARGE_INTEGER 		ce_time_t;
-	typedef LARGE_INTEGER 		ce_frequency_t;
+#if defined(SC_PLATFORM_WINDOWS)
 
-	#define ceGetTimerFrequency(dst) do {									\
-			QueryPerformanceFrequency(&(dst));								\
-		} while(0)
-		
-	#define ceGetCurrentTime(dst) do { 										\
-        	QueryPerformanceCounter(&(dst)); 								\
-		} while (0)
-		
-	#define ceSubtractTimeInSeconds(delta, freq, a, b) do {					\
-			delta = (b).LowPart ? (((double)(a).QuadPart - (double)(b).QuadPart) / (double)(freq).QuadPart) : 0.0; \
-		} while (0)
-		
-	#define ceAssignTimeValue(dst, src) do { 								\
-			(dst) = (src)c; 												\
-		} while (0)
+	typedef LARGE_INTEGER 				sc_time;
+	typedef LARGE_INTEGER 				sc_frequency;
 
-#elif defined(CE_PLATFORM_MACOSX)
-	/* OSX */
+#elif defined(SC_PLATFORM_MACOSX)
+
 	#include <mach/mach_time.h>
-	typedef uint64_t 					ce_time_t;
-	typedef mach_timebase_info_data_t 	ce_frequency_t;
 
-	#define ceGetTimerFrequency(dst) do {									\
-			mach_timebase_info(&(dst));										\
-		} while(0)
-		
-	#define ceGetCurrentTime(dst) do { 										\
-        	(dst) = mach_absolute_time(); 									\
-		} while (0)
-		
-	#define ceSubtractTimeInSeconds(delta, freq, a, b) do {					\
-			ce_time_t difference = (a) - (b);								\
-			delta = 1e-9 * (double) (freq).numer / (double) (freq).denom;	\
-			delta = delta * difference;										\
-		} while (0)
-		
-	#define ceAssignTimeValue(dst, src) do { 								\
-			(dst) = (src);	 												\
-		} while (0)
+	typedef uint64_t 					sc_time;
+	typedef mach_timebase_info_data_t 	sc_frequency;
 
+#elif defined(SC_PLATFORM_LINUX)
+
+	typedef struct timeval 				sc_time;
+	typedef double 						sc_frequency;
+		
 #else
-	/* Linux */
-	typedef struct timeval 		ce_time_t;
-	typedef double 				ce_frequency_t;
-
-	#define ceGetTimerFrequency(freq) do {									\
-			(void) (freq);													\
-		} while(0)
-		
-	#define ceGetCurrentTime(dst) do { 										\
-        	gettimeofday(&(dst), NULL); 									\
-		} while (0)
-		
-	#define ceSubtractTimeInSeconds(delta, freq, a, b) do {					\
-			(void) (freq);													\
-			delta = ((double)(a).tv_sec + 1.0e-6 * (double)(a).tv_usec);	\
-			delta -= ((double)(b).tv_sec + 1.0e-6 * (double)(b).tv_usec);   \
-		} while (0)
-		
-	#define ceAssignTimeValue(dst, src) do { 								\
-			(dst).tv_sec = (src).tv_sec; 									\
-			(dst).tv_usec = (src).tv_usec; 									\
-		} while (0)
-		
+#error "Timer data types need to be implemented for platform!"
 #endif
 
 /**************************************************************************************************/
 
-typedef struct _ce_profiling_info_t {
-	ce_time_t					counters[3];
-	ce_frequency_t				frequency;
-	double						conversion;
-} ce_profiling_info_t;
+extern SC_API_EXPORT sc_frequency
+scGetTimerFrequencyForHost(sc_session session, sc_status *status);
+
+extern SC_API_EXPORT sc_time
+scGetCurrentTimeForHost(sc_session session, sc_status *status);
+
+extern SC_API_EXPORT sc_double
+scGetTimeDeltaForHost(sc_session session, sc_uint counter, sc_status *status);
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
+SC_EXTERN_C_END
 
-#endif /* __CE_PROFILING_H__ */
+#endif /* __SC_PROFILING_H__ */
 

@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_COMPUTE_H__
-#define __CE_COMPUTE_H__
+#ifndef __SC_COMPUTE_H__
+#define __SC_COMPUTE_H__
 
 /* Platform ***************************************************************************************/
 
@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
 
 /* Types ******************************************************************************************/
 
@@ -71,13 +71,13 @@ CE_EXTERN_C_BEGIN
 
 #include "map.h"
 
-/* Session ****************************************************************************************/
-
-#include "session.h"
-
 /* Device *****************************************************************************************/
 
 #include "device.h"
+
+/* Session ****************************************************************************************/
+
+#include "session.h"
 
 /** Profiling *************************************************************************************/
 
@@ -89,6 +89,6 @@ CE_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
+SC_EXTERN_C_END
 
 #endif /* __COMPUTE_H__ */

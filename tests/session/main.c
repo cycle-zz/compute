@@ -1,40 +1,40 @@
 #include "compute.h"
 
-ce_status
+sc_status
 TestSessionForHost(void)
 {
-	ceTest(NULL, "Testing session for host...\n");
-	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	scTest(NULL, "Testing session for host...\n");
+	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
 
-	ce_session session = ceCreateSessionForHost();
-	if(ceIsValidSession(session))
+	sc_session session = scCreateSessionForHost();
+	if(scIsValidSession(session))
 	{
-		ceReleaseSession(session);
-		ceTest(NULL, "PASSED!\n");
-		return CE_SUCCESS;
+		scReleaseSession(session);
+		scTest(NULL, "PASSED!\n");
+		return SC_SUCCESS;
 	}
 
-	ceTest(NULL, "FAILED!\n");
-	return CE_INVALID_SESSION;
+	scTest(NULL, "FAILED!\n");
+	return SC_INVALID_SESSION;
 }
 
-ce_status
-TestSessionForDeviceType(ce_uint type)
+sc_status
+TestSessionForDeviceType(sc_uint type)
 {
-	ce_status status;
-	ceTest(NULL, "Testing session for device type '%s'...\n", ceGetDeviceTypeString(type, &status));
-	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	sc_status status;
+	scTest(NULL, "Testing session for device type '%s'...\n", scGetDeviceTypeString(type, &status));
+	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
 
-	ce_session session = ceCreateSessionForDeviceType(type, 0);
-	if(ceIsValidSession(session))
+	sc_session session = scCreateSessionForDeviceType(type, 0, &status);
+	if(scIsValidSession(session))
 	{
-		ceReleaseSession(session);
-		ceTest(NULL, "PASSED!\n");
-		return CE_SUCCESS;
+		scReleaseSession(session);
+		scTest(NULL, "PASSED!\n");
+		return SC_SUCCESS;
 	}
 	
-	ceTest(NULL, "FAILED!\n");
-	return CE_INVALID_SESSION;
+	scTest(NULL, "FAILED!\n");
+	return SC_INVALID_SESSION;
 }
 
 int
@@ -43,19 +43,19 @@ main(int argc, char *argv[])
 	char *progname;
 	progname = argv[0];
 		  
-	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
 	
-	ceAssert(TestSessionForHost() == CE_SUCCESS);
-	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	scAssert(TestSessionForHost() == SC_SUCCESS);
+	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
 	
-	ceAssert(TestSessionForDeviceType(CL_DEVICE_TYPE_ALL) == CE_SUCCESS);
-	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	scAssert(TestSessionForDeviceType(SC_DEVICE_TYPE_ALL) == SC_SUCCESS);
+	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
 	
-	ceAssert(TestSessionForDeviceType(CL_DEVICE_TYPE_GPU) == CE_SUCCESS);
-	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	scAssert(TestSessionForDeviceType(SC_DEVICE_TYPE_GPU) == SC_SUCCESS);
+	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
 	
-	ceAssert(TestSessionForDeviceType(CL_DEVICE_TYPE_CPU) == CE_SUCCESS);
-	ceTest(NULL, "%s\n", CE_LOG_SEPARATOR);
+	scAssert(TestSessionForDeviceType(SC_DEVICE_TYPE_CPU) == SC_SUCCESS);
+	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
   	
 	return 0;
 }

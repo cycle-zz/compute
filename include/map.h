@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_MAP_H__
-#define __CE_MAP_H__
+#ifndef __SC_MAP_H__
+#define __SC_MAP_H__
 
 /**************************************************************************************************/
 
@@ -44,33 +44,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-#define CE_DEFAULT_MAP_SIZE 	(256)
+#define SC_DEFAULT_MAP_SIZE 	(256)
 
 /**************************************************************************************************/
 
-extern CE_API_EXPORT ce_map 
-ceCreateMap(ce_session session, size_t size);
+extern SC_API_EXPORT sc_map 
+scCreateMap(sc_session session, size_t size);
 
-extern CE_API_EXPORT void 
-ceReleaseMap(ce_map map);
+extern SC_API_EXPORT void 
+scReleaseMap(sc_map map);
 
-extern CE_API_EXPORT cl_int
-ceMapInsert(ce_map map, ce_symbol key, ce_reference item);
+extern SC_API_EXPORT cl_int
+scMapInsert(sc_map map, sc_symbol key, sc_reference item);
 
-extern CE_API_EXPORT ce_reference 
-ceMapRemove(ce_map map, ce_symbol key);
+extern SC_API_EXPORT sc_reference 
+scMapRemove(sc_map map, sc_symbol key);
 
-extern CE_API_EXPORT ce_reference
-ceGetMapItem(ce_map map, ce_symbol key);
-
-/**************************************************************************************************/
-
-CE_EXTERN_C_BEGIN
+extern SC_API_EXPORT sc_reference
+scGetMapItem(sc_map map, sc_symbol key);
 
 /**************************************************************************************************/
 
-#endif /* __CE_MAP_H__ */
+SC_EXTERN_C_BEGIN
+
+/**************************************************************************************************/
+
+#endif /* __SC_MAP_H__ */

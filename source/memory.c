@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -38,55 +38,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-typedef ce_type							ce_type_t;
+typedef sc_type							sc_type_t;
 
-typedef struct _ce_reference_t {
-	ce_session							session;
+typedef struct _sc_reference_t {
+	sc_session							session;
 	void*								ptr;
-	ce_type_t 							type;
-#if defined(CE_64BIT)
-	ce_atomic_long						count;
+	sc_type_t 							type;
+#if defined(SC_64BIT)
+	sc_atomic_long						count;
 #else
-	ce_atomic_int						count;
+	sc_atomic_int						count;
 #endif
-} ce_reference_t;
+} sc_reference_t;
 
-typedef struct _ce_memory_block_t
+typedef struct _sc_memory_block_t
 {
-	ce_reference_t*						reference;
+	sc_reference_t*						reference;
 	size_t 								size;
 	const char* 						filename;
 	cl_uint 							line;
-	struct _ce_memory_block_t* 			prev;
-	struct _ce_memory_block_t* 			next;
-} ce_memory_block_t;
+	struct _sc_memory_block_t* 			prev;
+	struct _sc_memory_block_t* 			next;
+} sc_memory_block_t;
 
-typedef struct _ce_memory_info_t 
+typedef struct _sc_memory_info_t 
 {
 	size_t 								allocations;
 	size_t 								deallocations;
 	size_t 								max_allowed_bytes;
 	size_t 								block_count;
 	size_t 								byte_count;
-	ce_memory_block_t* 					head_block;
-	ce_memory_block_t* 					tail_block;
-	cl_bool 							track_sizes;
+	sc_memory_block_t* 					head_block;
+	sc_memory_block_t* 					tail_block;
+	sc_bool 							track_sizes;
 	size_t 								max_allocated_bytes;
 	size_t 								max_block_size;
 	size_t 								histogram[32];
-} ce_memory_info_t;
-
-typedef struct _ce_session_memory_t {
-	ce_memory_info*						host;
-	ce_memory_info*						device;
-} ce_session_memory_info_t;
+} sc_memory_info_t;
 
 /**************************************************************************************************/
 
 static void 
 InsertBlock (
-	ce_memory_info_t *info, 
-	ce_memory_block_t* block)
+	sc_memory_info_t *info, 
+	sc_memory_block_t* block)
 {
     if (info->tail_block)
     {
@@ -107,8 +102,8 @@ InsertBlock (
 
 static void 
 RemoveBlock (
-	ce_memory_info_t *info, 
-	ce_memory_block_t* block)
+	sc_memory_info_t *info, 
+	sc_memory_block_t* block)
 {
     if (block->prev)
     {
@@ -138,61 +133,59 @@ HostMalloc(size_t size)
 	void* ptr = (void*)malloc(size);
 	if(!ptr)
 	{
-		ceCritical(CE_DEFAULT_SESSION, "Out of host memory!");
+		scCritical(SC_DEFAULT_SESSION, "Out of host memory!");
 		return 0;
 	}
 
-	ceDebug(CE_DEFAULT_SESSION, "HostMalloc: Allocated '%p' '%04d' bytes\n", ptr, size);
+	scDebug(SC_DEFAULT_SESSION, "HostMalloc: Allocated '%p' '%04d' bytes\n", ptr, size);
 	return ptr;
 }
 
 static void
 HostFree(void* ptr)
 {
-	ceDebug(CE_DEFAULT_SESSION, "HostFree: Freeing '%p'\n", ptr);
+	scDebug(SC_DEFAULT_SESSION, "HostFree: Freeing '%p'\n", ptr);
 	free(ptr);
 }
 
 /**************************************************************************************************/
 
 void* 
-ceAllocateHostMemory (
-	ce_session handle,
+scAllocateHostMemory (
+	sc_session handle,
 	size_t bytes, 
 	char* filename, 
 	unsigned int line)
 {
-	ce_session_t* session = (ce_session_t*)handle;
-	ce_session_memory_info_t* memory = session ? (ce_session_memory_info_t*)session->memory : NULL;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : NULL;
-
-	if(!session || !memory || !info)
+	sc_memory_info_t* memory = handle ? (sc_memory_info_t*)scGetMemoryInfo(handle, NULL) : NULL;
+	sc_memory_info_t* info = memory ? ((sc_memory_info_t*)&memory[0]) : NULL;
+	if(info == NULL)
 	{
 		return HostMalloc(bytes);
 	}
 
     info->allocations++;
-    size_t extended = sizeof(ce_memory_block_t) + bytes;
+    size_t extended = sizeof(sc_memory_block_t) + bytes;
 
     char* ptr = (char*)HostMalloc(extended);
     if(!ptr)
         return 0;
 
-    ce_memory_block_t* block = (ce_memory_block_t*)ptr;
+    sc_memory_block_t* block = (sc_memory_block_t*)ptr;
 	block->reference = NULL;
 	block->size = bytes;
     block->filename = filename;
     block->line = line;
     InsertBlock(info, block);
 
-    ptr += sizeof(ce_memory_block_t);
+    ptr += sizeof(sc_memory_block_t);
 
     info->block_count++;
     info->byte_count += bytes;
 
     if (info->max_allowed_bytes > 0 && info->byte_count > info->max_allowed_bytes)
     {
-        ceWarning(handle, "Allocation has exceeded the maximum number of allowed bytes!");
+        scWarning(handle, "Allocation has exceeded the maximum number of allowed bytes!");
         return 0;
     }
 
@@ -227,41 +220,39 @@ ceAllocateHostMemory (
     return (void*)ptr;
 }
 
-ce_status
-ceDeallocateHostMemory(
-	ce_session handle, 
+sc_status
+scDeallocateHostMemory(
+	sc_session handle, 
 	void* ptr)
 {
-	ce_session_t* session = (ce_session_t*)handle;
-	ce_session_memory_info_t* memory = session ? (ce_session_memory_info_t*)session->memory : NULL;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : NULL;
-
-	if(!session || !memory || !info)
+	sc_memory_info_t* memory = handle ? (sc_memory_info_t*)scGetMemoryInfo(handle, NULL) : NULL;
+	sc_memory_info_t* info = memory ? ((sc_memory_info_t*)&memory[0]) : NULL;
+	if(info == NULL)
 	{
 		HostFree(ptr);
-		return CE_SUCCESS;
+		return SC_SUCCESS;
 	}
 	
-    if (!ptr)
+    if (ptr == NULL)
     {
-        return CE_INVALID_VALUE;
+        return SC_INVALID_VALUE;
     }
 
-    ptr -= sizeof(ce_memory_block_t);
-    ce_memory_block_t* block = (ce_memory_block_t*)ptr;
+    ptr -= sizeof(sc_memory_block_t);
+    sc_memory_block_t* block = (sc_memory_block_t*)ptr;
     if(block->reference)
     {
     	if(block->reference->count)
 		{
-	#if defined(CE_64BIT) 
-			ceAtomicAddLong(&block->reference->count, -1);
+	#if defined(SC_64BIT) 
+			scAtomicAddLong(&block->reference->count, -1);
 	#else
-			ceAtomicAddInt(&block->reference->count, -1);
+			scAtomicAddInt(&block->reference->count, -1);
 	#endif
 		}
 		
     	if(block->reference->count)
-			return CE_SUCCESS;		
+			return SC_SUCCESS;		
 			
 		HostFree(block->reference);
 		block->reference = NULL;
@@ -278,103 +269,97 @@ ceDeallocateHostMemory(
 	}
 	else
 	{
-        ceWarning(handle, "Deallocation size mismatch for memory block!");
-		return CE_SIZE_MISMATCH;
+        scWarning(handle, "Deallocation size mismatch for memory block!");
+		return SC_SIZE_MISMATCH;
 	}
-	return CE_SUCCESS;
+	return SC_SUCCESS;
 }
 
-ce_reference
-ceCreateReference(
-	ce_session handle,
+sc_reference
+scCreateReference(
+	sc_session handle,
 	void* ptr)
 {
-	ce_session_t* session = (ce_session_t*)handle;
-	ce_session_memory_info_t* memory = session ? (ce_session_memory_info_t*)session->memory : NULL;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : NULL;
-
-	if(!session || !memory || !info)
-	{
+	sc_memory_info_t* memory = handle ? (sc_memory_info_t*)scGetMemoryInfo(handle, NULL) : NULL;
+	sc_memory_info_t* info = memory ? ((sc_memory_info_t*)&memory[0]) : NULL;
+	if(info == NULL)
 		return NULL;
-	}
 	
-    volatile ce_memory_block_t* block = (ce_memory_block_t*)(ptr - sizeof(ce_memory_block_t));
-    if(!block)
+    volatile sc_memory_block_t* block = (sc_memory_block_t*)(ptr - sizeof(sc_memory_block_t));
+    if(block == NULL)
     	return NULL;
     	
     if(!block->reference)
     {
-    	block->reference = (ce_reference_t*)malloc(sizeof(ce_reference_t));
-		memset(block->reference, 0, sizeof(ce_reference_t));
+    	block->reference = (sc_reference_t*)malloc(sizeof(sc_reference_t));
+		memset(block->reference, 0, sizeof(sc_reference_t));
 
 		block->reference->session = handle;
 		block->reference->ptr = ptr;
     }
     
-#if defined(CE_64BIT) 
-	ceAtomicAddLong(&(block->reference->count), 1);
+#if defined(SC_64BIT) 
+	scAtomicAddLong(&(block->reference->count), 1);
 #else
-	ceAtomicAddInt(&(block->reference->count), 1);
+	scAtomicAddInt(&(block->reference->count), 1);
 #endif
-	return (ce_reference)block->reference;
+	return (sc_reference)block->reference;
 }
 
-ce_status 
-ceRetain(
-	ce_session handle, 
-	ce_reference reference)
+sc_status 
+scRetain(
+	sc_session handle, 
+	sc_reference reference)
 {
-	ce_session_t* session = (ce_session_t*)handle;
-	ce_session_memory_info_t* memory = session ? (ce_session_memory_info_t*)session->memory : NULL;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : NULL;
-	void* ptr = reference ? ((ce_reference_t*)reference)->ptr : NULL;
+	sc_memory_info_t* memory = handle ? (sc_memory_info_t*)scGetMemoryInfo(handle, NULL) : NULL;
+	sc_memory_info_t* info = memory ? ((sc_memory_info_t*)&memory[0]) : NULL;
 
-	if(!session || !memory || !info || !ptr)
-		return CE_INVALID_MEMORY_INFO;
+	void* ptr = reference ? ((sc_reference_t*)reference)->ptr : NULL;
 
-    volatile ce_memory_block_t* block = (ce_memory_block_t*)(ptr - sizeof(ce_memory_block_t));
+	if(info == NULL || ptr == NULL)
+		return SC_INVALID_MEMORY_INFO;
+
+    volatile sc_memory_block_t* block = (sc_memory_block_t*)(ptr - sizeof(sc_memory_block_t));
 	if(!block)
-		return CE_INVALID_MEMORY_INFO;
+		return SC_INVALID_MEMORY_INFO;
     
     if(!block->reference)
     {
-    	block->reference = (ce_reference_t*)malloc(sizeof(ce_reference_t));
-		memset(block->reference, 0, sizeof(ce_reference_t));
+    	block->reference = (sc_reference_t*)malloc(sizeof(sc_reference_t));
+		memset(block->reference, 0, sizeof(sc_reference_t));
 
 		block->reference->session = handle;
 		block->reference->ptr = ptr;
     }
 	
-#if defined(CE_64BIT) 
-	ceAtomicAddLong(&(block->reference->count), 1);
+#if defined(SC_64BIT) 
+	scAtomicAddLong(&(block->reference->count), 1);
 #else
-	ceAtomicAddInt(&(block->reference->count), 1);
+	scAtomicAddInt(&(block->reference->count), 1);
 #endif
 
-	return CE_SUCCESS;
+	return SC_SUCCESS;
 }
 
-ce_status
-ceRelease(
-	ce_session handle,
-	ce_reference reference)
+sc_status
+scRelease(
+	sc_session handle,
+	sc_reference reference)
 {
-	void* ptr = reference ? ((ce_reference_t*)reference)->ptr : NULL;
-	return ceDeallocateHostMemory(handle, ptr);
+	void* ptr = reference ? ((sc_reference_t*)reference)->ptr : NULL;
+	return scDeallocateHostMemory(handle, ptr);
 }
 
-ce_status
-ceLogHostMemoryInfo(
-	ce_session handle)
+sc_status
+scLogHostMemoryInfo(
+	sc_session handle)
 {
-	ce_session_t* session = (ce_session_t*)handle;
-	ce_session_memory_info_t* memory = session ? (ce_session_memory_info_t*)session->memory : NULL;
-	ce_memory_info_t* info = memory ? ((ce_memory_info_t*)memory->host) : NULL;
-
-	if(!session || !memory || !info)
+	sc_memory_info_t* memory = handle ? (sc_memory_info_t*)scGetMemoryInfo(handle, NULL) : NULL;
+	sc_memory_info_t* info = memory ? ((sc_memory_info_t*)&memory[0]) : NULL;
+	if(info == NULL)
 	{
-		ceWarning(handle, "Host memory tracking not enabled!");
-		return CE_INVALID_MEMORY_INFO;
+		scWarning(handle, "Host memory tracking not enabled!");
+		return SC_INVALID_MEMORY_INFO;
 	}
 		
 	size_t index = 0;
@@ -382,13 +367,13 @@ ceLogHostMemoryInfo(
     size_t named_byte_count = 0;
     size_t anonymous_block_count = 0;
     size_t anonymous_byte_count = 0;
-    ce_memory_block_t* block = 0;
+    sc_memory_block_t* block = 0;
 
-	ceInfo(handle, "Total number of host memory allocations: %d", info->allocations);
-	ceInfo(handle, "Total number of host memory deallocations: %d", info->deallocations);
-	ceInfo(handle, "Maximum number of bytes allocated in host memory: %d", info->max_allocated_bytes);
-	ceInfo(handle, "Number of blocks in host memory still allocated: %d", info->block_count);
-	ceInfo(handle, "Number of bytes in host memory still allocated: %d", info->byte_count);
+	scInfo(handle, "Total number of host memory allocations: %d", info->allocations);
+	scInfo(handle, "Total number of host memory deallocations: %d", info->deallocations);
+	scInfo(handle, "Maximum number of bytes allocated in host memory: %d", info->max_allocated_bytes);
+	scInfo(handle, "Number of blocks in host memory still allocated: %d", info->block_count);
+	scInfo(handle, "Number of bytes in host memory still allocated: %d", info->byte_count);
 
 	block = info->head_block;
     while (block)
@@ -406,11 +391,11 @@ ceLogHostMemoryInfo(
         block = block->next;
     }
 
-	ceInfo(handle, "Number of named blocks in host memory: %d", named_block_count);
-	ceInfo(handle, "Number of named bytes in host memory: %d", named_byte_count);
+	scInfo(handle, "Number of named blocks in host memory: %d", named_block_count);
+	scInfo(handle, "Number of named bytes in host memory: %d", named_byte_count);
 
-	ceInfo(handle, "Number of anonymous blocks in host memory: %d", anonymous_block_count);
-	ceInfo(handle, "Number of anonymous bytes in host memory: %d", anonymous_byte_count);
+	scInfo(handle, "Number of anonymous blocks in host memory: %d", anonymous_block_count);
+	scInfo(handle, "Number of anonymous bytes in host memory: %d", anonymous_byte_count);
 
     block = info->head_block;
     index = 0;
@@ -419,14 +404,14 @@ ceLogHostMemoryInfo(
 
         if (block->filename)
         {
-			ceInfo(handle, "block[%08d] : %08d bytes -- file: '%s' line '%04d'", index, block->size, block->filename, block->line);
+			scInfo(handle, "block[%08d] : %08d bytes -- file: '%s' line '%04d'", index, block->size, block->filename, block->line);
         }
         else
         {
-			ceInfo(handle, "block[%08d] : %08d bytes -- file: 'unknown' line 'unknown'", index, block->size, block->filename, block->line);
+			scInfo(handle, "block[%08d] : %08d bytes -- file: 'unknown' line 'unknown'", index, block->size, block->filename, block->line);
         }
         block = block->next;
         index++;
     }
-	return CE_SUCCESS;
+	return SC_SUCCESS;
 }

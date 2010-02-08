@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -32,8 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************************************/
 
-#ifndef __CE_MEMORY_H__
-#define __CE_MEMORY_H__
+#ifndef __SC_MEMORY_H__
+#define __SC_MEMORY_H__
 
 /**************************************************************************************************/
 
@@ -44,52 +44,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 /**************************************************************************************************/
 
-CE_EXTERN_C_BEGIN
+SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-#define ceAllocate(session, size) 	ceAllocateHostMemory(session, size, __FILE__ , __LINE__)
-#define ceDeallocate(session, ptr) 	ceDeallocateHostMemory(session, ptr)
+#define scAllocate(session, size) 	scAllocateHostMemory(session, size, __FILE__ , __LINE__)
+#define scDeallocate(session, ptr) 	scDeallocateHostMemory(session, ptr)
 
-extern CE_API_EXPORT 
-void* ceAllocateHostMemory(ce_session session, size_t bytes, char* filename, unsigned int line);
+extern SC_API_EXPORT 
+void* scAllocateHostMemory(sc_session session, size_t bytes, char* filename, unsigned int line);
 
-extern CE_API_EXPORT ce_status 
-ceDeallocateHostMemory(ce_session session, void* ptr);
-
-/**************************************************************************************************/
-
-extern CE_API_EXPORT ce_status
-ceEnableHostMemoryTracking(ce_session session);
-
-extern CE_API_EXPORT ce_status
-ceDisableHostMemoryTracking(ce_session session);
-
-extern CE_API_EXPORT ce_status 
-ceLogHostMemoryInfo(ce_session session);
-
-extern CE_API_EXPORT ce_status
-ceEnableDeviceMemoryTracking(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT ce_status
-ceDisableDeviceMemoryTracking(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT void 
-ceLogDeviceMemoryInfo(ce_session session, cl_device_id device);
-
-extern CE_API_EXPORT ce_reference
-ceCreateReference(ce_session, void* ptr);
-
-extern CE_API_EXPORT ce_status
-ceRetain(ce_session session, ce_reference reference);
-
-extern CE_API_EXPORT ce_status
-ceRelease(ce_session session, ce_reference reference);
+extern SC_API_EXPORT sc_status 
+scDeallocateHostMemory(sc_session session, void* ptr);
 
 /**************************************************************************************************/
 
-CE_EXTERN_C_END
+extern SC_API_EXPORT sc_status
+scEnableHostMemoryTracking(sc_session session);
+
+extern SC_API_EXPORT sc_status
+scDisableHostMemoryTracking(sc_session session);
+
+extern SC_API_EXPORT sc_status 
+scLogHostMemoryInfo(sc_session session);
+
+extern SC_API_EXPORT sc_status
+scEnableDeviceMemoryTracking(sc_session session, cl_device_id device);
+
+extern SC_API_EXPORT sc_status
+scDisableDeviceMemoryTracking(sc_session session, cl_device_id device);
+
+extern SC_API_EXPORT void 
+scLogDeviceMemoryInfo(sc_session session, cl_device_id device);
+
+extern SC_API_EXPORT sc_reference
+scCreateReference(sc_session, void* ptr);
+
+extern SC_API_EXPORT sc_status
+scRetain(sc_session session, sc_reference reference);
+
+extern SC_API_EXPORT sc_status
+scRelease(sc_session session, sc_reference reference);
 
 /**************************************************************************************************/
 
-#endif /* __CE_MEMORY_H__ */
+SC_EXTERN_C_END
+
+/**************************************************************************************************/
+
+#endif /* __SC_MEMORY_H__ */

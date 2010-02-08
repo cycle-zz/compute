@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwva->edu.au> 
 The University of Western Australiva-> All rights reserved.
@@ -37,256 +37,256 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /**************************************************************************************************/
 
-typedef struct _ce_value_t {
-	ce_type 	type;
-	union _ce_value_data {
-		ce_bool 	as_bool;
-		ce_char 	as_char;
-		ce_uchar 	as_uchar;
-		ce_short	as_short;
-		ce_ushort 	as_ushort;
-		ce_int 		as_int;
-		ce_uint 	as_uint;
-		ce_long 	as_long;
-		ce_ulong 	as_ulong;
-		ce_float 	as_float;
-		ce_double 	as_double;
-		ce_symbol	as_symbol;
+typedef struct _sc_value_t {
+	sc_type 	type;
+	union _sc_value_data {
+		sc_bool 	as_bool;
+		sc_char 	as_char;
+		sc_uchar 	as_uchar;
+		sc_short	as_short;
+		sc_ushort 	as_ushort;
+		sc_int 		as_int;
+		sc_uint 	as_uint;
+		sc_long 	as_long;
+		sc_ulong 	as_ulong;
+		sc_float 	as_float;
+		sc_double 	as_double;
+		sc_symbol	as_symbol;
 	} data;
-} ce_value_t;
+} sc_value_t;
 
-typedef struct _ce_option_t {
-	ce_session		session;
-	ce_symbol		name;
-	ce_symbol		usage;
-	ce_bool			updated;
-	ce_value		value;
-} ce_option_t;
+typedef struct _sc_option_t {
+	sc_session		session;
+	sc_symbol		name;
+	sc_symbol		usage;
+	sc_bool			updated;
+	sc_value		value;
+} sc_option_t;
 
 /**************************************************************************************************/
 
-static ce_int
-ParseOption(const char* arg, ce_option handle)
+static sc_int
+ParseOption(const char* arg, sc_option handle)
 {
 	if(!arg || !handle)
-		return CE_INVALID_VALUE;
+		return SC_INVALID_VALUE;
 
-	ce_status status;
-	ce_option_t* option = (ce_option_t*)handle;
-	ce_value value = (ce_value)option->value;
-	switch(ceGetValueType(value, &status))
+	sc_status status;
+	sc_option_t* option = (sc_option_t*)handle;
+	sc_value value = (sc_value)option->value;
+	switch(scGetValueType(value, &status))
 	{
-		case (CE_TYPE_BOOL):
+		case (SC_TYPE_BOOL):
 			if(isdigit(arg[0]))
 			{
-				ceSetBoolValue(value, (atoi(arg) > 0) ? (CE_TRUE) : (CE_FALSE));
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetBoolValue(value, (atoi(arg) > 0) ? (SC_TRUE) : (SC_FALSE));
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			else if(strcmp(arg, "true") == 0)
 			{
-				ceSetBoolValue(value, CE_TRUE);
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetBoolValue(value, SC_TRUE);
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			else if(strcmp(arg, "True") == 0)
 			{
-				ceSetBoolValue(value, CE_TRUE);
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetBoolValue(value, SC_TRUE);
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			else if(strcmp(arg, "false") == 0)
 			{
-				ceSetBoolValue(value, CE_FALSE);
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetBoolValue(value, SC_FALSE);
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			else if(strcmp(arg, "False") == 0)
 			{
-				ceSetBoolValue(value, CE_FALSE);
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetBoolValue(value, SC_FALSE);
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			break;
-		case (CE_TYPE_CHAR):
+		case (SC_TYPE_CHAR):
 			if(isdigit(arg[0]))
 			{
-				ceSetCharValue(value, (ce_char)atoi(arg));
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetCharValue(value, (sc_char)atoi(arg));
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			break;
-		case (CE_TYPE_UCHAR):
+		case (SC_TYPE_UCHAR):
 			if(isdigit(arg[0]))
 			{
-				ceSetUCharValue(value, (ce_char)atoi(arg));
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetUCharValue(value, (sc_char)atoi(arg));
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			break;
-		case (CE_TYPE_SHORT):
+		case (SC_TYPE_SHORT):
 			if(isdigit(arg[0]))
 			{
-				ceSetShortValue(value, (ce_short)atoi(arg));
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetShortValue(value, (sc_short)atoi(arg));
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			break;
-		case (CE_TYPE_USHORT):
+		case (SC_TYPE_USHORT):
 			if(isdigit(arg[0]))
 			{
-				ceSetUShortValue(value, (ce_short)atoi(arg));
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetUShortValue(value, (sc_short)atoi(arg));
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			break;
-		case (CE_TYPE_INT):
+		case (SC_TYPE_INT):
 			if(isdigit(arg[0]))
 			{
-				ceSetIntValue(value, (ce_int)atoi(arg));
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetIntValue(value, (sc_int)atoi(arg));
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			break;
-		case (CE_TYPE_UINT):
+		case (SC_TYPE_UINT):
 			if(isdigit(arg[0]))
 			{
-				ceSetUIntValue(value, (ce_uint)atoi(arg));
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetUIntValue(value, (sc_uint)atoi(arg));
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			break;
-		case (CE_TYPE_LONG):
+		case (SC_TYPE_LONG):
 			if(isdigit(arg[0]))
 			{
-				ceSetLongValue(value, (ce_long)atol(arg));
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetLongValue(value, (sc_long)atol(arg));
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			break;
-		case (CE_TYPE_ULONG):
+		case (SC_TYPE_ULONG):
 			if(isdigit(arg[0]))
 			{
-				ceSetULongValue(value, (ce_ulong)atol(arg));
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetULongValue(value, (sc_ulong)atol(arg));
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			break;
-		case (CE_TYPE_FLOAT):
+		case (SC_TYPE_FLOAT):
 			{
 				char* end = 0;
-				ceSetFloatValue(value, (ce_float)strtof(arg, &end));
+				scSetFloatValue(value, (sc_float)strtof(arg, &end));
 				if(end != arg)
 				{
-					option->updated = CE_TRUE;
-					return CE_SUCCESS;
+					option->updated = SC_TRUE;
+					return SC_SUCCESS;
 				}
 			}
 			break;
-		case (CE_TYPE_DOUBLE):
+		case (SC_TYPE_DOUBLE):
 			{
 				char* end = 0;
-				ceSetDoubleValue(value, (ce_double)strtod(arg, &end));
+				scSetDoubleValue(value, (sc_double)strtod(arg, &end));
 				if(end != arg)
 				{
-					option->updated = CE_TRUE;
-					return CE_SUCCESS;
+					option->updated = SC_TRUE;
+					return SC_SUCCESS;
 				}
 			}
 			break;
-		case (CE_TYPE_SYMBOL):
+		case (SC_TYPE_SYMBOL):
 			{
-				ceSetSymbolValue(value, ceCreateSymbol(NULL, arg, strlen(arg)));
-				option->updated = CE_TRUE;
-				return CE_SUCCESS;
+				scSetSymbolValue(value, scCreateSymbol(NULL, arg, strlen(arg)));
+				option->updated = SC_TRUE;
+				return SC_SUCCESS;
 			}
 			break;
 		default:
-			return CE_INVALID_VALUE;	
+			return SC_INVALID_VALUE;	
 	}
 	
-	return CE_INVALID_VALUE;	
+	return SC_INVALID_VALUE;	
 }
 
 /**************************************************************************************************/
 
-ce_option
-ceCreateOption(
-	ce_session session, const char* name, ce_type type, const char* usage)
+sc_option
+scCreateOption(
+	sc_session session, const char* name, sc_type type, const char* usage)
 {
-	ce_option_t* option = ceAllocate(session, sizeof(ce_option_t));
+	sc_option_t* option = scAllocate(session, sizeof(sc_option_t));
 	if(!option)
 		return NULL;
 		
-	memset(option, 0, sizeof(ce_option_t));
+	memset(option, 0, sizeof(sc_option_t));
 	
 	if(name)
-		option->name = ceCreateSymbol(session, name, strlen(name));
+		option->name = scCreateSymbol(session, name, strlen(name));
 		
 	if(usage)
-		option->usage = ceCreateSymbol(session, usage, strlen(usage));
+		option->usage = scCreateSymbol(session, usage, strlen(usage));
 
 	option->session = session;	
-	option->value = ceCreateValue(session, type);
-	return (ce_option)option;
+	option->value = scCreateValue(session, type);
+	return (sc_option)option;
 }
 	
-ce_status
-ceReleaseOption(
-	ce_option handle)
+sc_status
+scReleaseOption(
+	sc_option handle)
 {
-	ce_option_t* option = (ce_option_t*)handle;
+	sc_option_t* option = (sc_option_t*)handle;
 	if(!option)
-		return CE_INVALID_VALUE;
+		return SC_INVALID_VALUE;
 		
 	if(option->name)
-		ceReleaseSymbol(option->name);
+		scReleaseSymbol(option->name);
 
 	if(option->usage)
-		ceReleaseSymbol(option->usage);
+		scReleaseSymbol(option->usage);
 
 	if(option->value)
-		ceReleaseValue(option->value);
+		scReleaseValue(option->value);
 
 
-	return ceDeallocate(option->session, option);
+	return scDeallocate(option->session, option);
 	
 }
 
 const char*
-ceGetOptionName(
-	ce_option handle, ce_status* status)
+scGetOptionName(
+	sc_option handle, sc_status* status)
 {
-	ce_option_t* option = (ce_option_t*)handle;
+	sc_option_t* option = (sc_option_t*)handle;
 	if(!option)
 	{
-		if(status) (*status) = CE_INVALID_VALUE;
+		if(status) (*status) = SC_INVALID_VALUE;
 		return NULL;
 	}
-	return ceGetSymbolName(option->name);
+	return scGetSymbolName(option->name);
 }
 
 const char*
-ceGetOptionUsage(
-	ce_option handle, ce_status* status)
+scGetOptionUsage(
+	sc_option handle, sc_status* status)
 {
-	ce_option_t* option = (ce_option_t*)handle;
+	sc_option_t* option = (sc_option_t*)handle;
 	if(!option)
 	{
-		if(status) (*status) = CE_INVALID_VALUE;
+		if(status) (*status) = SC_INVALID_VALUE;
 		return NULL;
 	}
-	return ceGetSymbolName(option->usage);
+	return scGetSymbolName(option->usage);
 }
 
-ce_value
-ceGetOptionValue(
-	ce_option handle, ce_status* status)
+sc_value
+scGetOptionValue(
+	sc_option handle, sc_status* status)
 {
-	ce_option_t* option = (ce_option_t*)handle;
+	sc_option_t* option = (sc_option_t*)handle;
 	if(!option)
 	{
-		if(status) (*status) = CE_INVALID_VALUE;
+		if(status) (*status) = SC_INVALID_VALUE;
 		return 0;
 	}
 	return option->value;
@@ -294,31 +294,31 @@ ceGetOptionValue(
 
 /**************************************************************************************************/
 
-ce_status
-ceParseCommandLineOptions(
-	ce_session session, ce_uint argc, const char **argv, ce_uint expected, ce_option* options)
+sc_status
+scParseCommandLineOptions(
+	sc_session session, sc_uint argc, const char **argv, sc_uint expected, sc_option* options)
 {
     int i, o;
-    cl_bool *found = ceAllocate(session, sizeof(ce_bool) * expected);
+    cl_bool *found = scAllocate(session, sizeof(sc_bool) * expected);
     if(!found)
-    	return CE_OUT_OF_HOST_MEMORY;
+    	return SC_OUT_OF_HOST_MEMORY;
 
-	memset(found, CE_FALSE, sizeof(ce_bool) * expected);
+	memset(found, SC_FALSE, sizeof(sc_bool) * expected);
 	
     for (i = 0; i < argc && argv && argv[i]; i++) 
     {
 		for(o = 0; o < expected; o++)
     	{
-			if(found[o] == CE_TRUE)
+			if(found[o] == SC_TRUE)
     			continue;
     			
     		const char* start = argv[i];
     		if(start[0] != '-')
     			continue;
 
-			const char* name = ceGetOptionName(options[o], NULL);
+			const char* name = scGetOptionName(options[o], NULL);
 
-			ceDebug(session, "ceParseCommandLineOptions: Parsing '%s'\n", name);
+			scDebug(session, "ceParseCommandLineOptions: Parsing '%s'\n", name);
 
     		const char* str = strstr(argv[i], name);
     		if(str && str - start <= 2)
@@ -326,45 +326,45 @@ ceParseCommandLineOptions(
 				const char* assign = strstr(str, "=");
 				if(assign)
 				{
-					ceDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s'\n", name, &assign[1]);
+					scDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s'\n", name, &assign[1]);
 	        	    
 	        	    ParseOption(&assign[1], options[o]);
 	        	    
-	        	    ce_value value = ceGetOptionValue(options[o], NULL);
+	        	    sc_value value = scGetOptionValue(options[o], NULL);
 	        	    
-					ceDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s' -> '%s' (%s)\n", name, argv[i], 
-						ceGetSymbolName(ceCreateSymbolFromValue(session, value, NULL) ),
-						ceGetTypeString(ceGetValueType(value, NULL), NULL));
+					scDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s' -> '%s' (%s)\n", name, argv[i], 
+						scGetSymbolName(scCreateSymbolFromValue(session, value, NULL) ),
+						scGetTypeString(scGetValueType(value, NULL), NULL));
 					
-					found[o] = CE_TRUE;
+					found[o] = SC_TRUE;
 				}
 				else if(i + 1 < argc && argv[i + 1])
 				{
-					ceDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s'\n", name, argv[i]);
+					scDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s'\n", name, argv[i]);
 	        	    
 	        	    ParseOption(argv[i], options[o]);
 					
-					ce_value value = ceGetOptionValue(options[o], NULL);
+					sc_value value = scGetOptionValue(options[o], NULL);
 	        	    
-					ceDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s' -> '%s' (%s)\n", name, argv[i], 
-						ceGetSymbolName(ceCreateSymbolFromValue(session, value, NULL) ),
-						ceGetTypeString(ceGetValueType(value, NULL), NULL));
+					scDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s' -> '%s' (%s)\n", name, argv[i], 
+						scGetSymbolName(scCreateSymbolFromValue(session, value, NULL) ),
+						scGetTypeString(scGetValueType(value, NULL), NULL));
 					
-					found[o] = CE_TRUE;
+					found[o] = SC_TRUE;
 				}
 				
-				if(found[o] == CE_TRUE)
+				if(found[o] == SC_TRUE)
 	        	    break;
     		}
     	}
 
-		if(found[o] == CE_TRUE)
+		if(found[o] == SC_TRUE)
 			continue;
 
     }
 
-	ceDeallocate(session, found);
-    return CE_SUCCESS;
+	scDeallocate(session, found);
+    return SC_SUCCESS;
 }
 
 /**************************************************************************************************/

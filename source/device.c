@@ -1,6 +1,6 @@
 /***************************************************************************************************
 
-Compute Engine - $CE_VERSION_TAG$ <$CE_ID_TAG$>
+Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
 Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
 The University of Western Australia. All rights reserved.
@@ -38,30 +38,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**************************************************************************************************/
 
 const char*
-ceGetDeviceTypeString(
-	ce_device_type type, ce_uint* status)
+scGetDeviceTypeString(
+	sc_device_type type, sc_uint* status)
 {
 	if(status)
-		(*status) = CE_SUCCESS;
+		(*status) = SC_SUCCESS;
 	
 	switch(type)
 	{
-		case CL_DEVICE_TYPE_DEFAULT:		return "default";
-		case CL_DEVICE_TYPE_ALL:			return "all";
-		case CL_DEVICE_TYPE_GPU:			return "gpu";
-		case CL_DEVICE_TYPE_CPU:			return "cpu";
-		case CL_DEVICE_TYPE_ACCELERATOR:	return "accelerator";
+		case SC_DEVICE_TYPE_DEFAULT:		return "default";
+		case SC_DEVICE_TYPE_ALL:			return "all";
+		case SC_DEVICE_TYPE_GPU:			return "gpu";
+		case SC_DEVICE_TYPE_CPU:			return "cpu";
+		case SC_DEVICE_TYPE_ACCELERATOR:	return "accelerator";
 		default:
 		{
 			if(status)
-				(*status) = CE_INVALID_TYPE;
+				(*status) = SC_INVALID_TYPE;
 		
 			return "unknown device type";
 		}
 	};
 
 	if(status)
-		(*status) = CE_INVALID_TYPE;
+		(*status) = SC_INVALID_TYPE;
 	
 	return "unknown device type";
 }
