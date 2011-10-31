@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -45,10 +45,10 @@ SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-extern SC_API_EXPORT sc_stack 
+extern SC_API_EXPORT sc_stack
 scCreateStack(sc_session session);
 
-extern SC_API_EXPORT sc_status 
+extern SC_API_EXPORT sc_status
 scReleaseStack(sc_stack stack);
 
 extern SC_API_EXPORT void

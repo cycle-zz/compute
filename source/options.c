@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwva->edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwva->edu.au>
 The University of Western Australiva-> All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -202,10 +202,10 @@ ParseOption(const char* arg, sc_option handle)
 			}
 			break;
 		default:
-			return SC_INVALID_VALUE;	
+			return SC_INVALID_VALUE;
 	}
-	
-	return SC_INVALID_VALUE;	
+
+	return SC_INVALID_VALUE;
 }
 
 /**************************************************************************************************/
@@ -217,20 +217,20 @@ scCreateOption(
 	sc_option_t* option = scAllocate(session, sizeof(sc_option_t));
 	if(!option)
 		return NULL;
-		
+
 	memset(option, 0, sizeof(sc_option_t));
-	
+
 	if(name)
 		option->name = scCreateSymbol(session, name, strlen(name));
-		
+
 	if(usage)
 		option->usage = scCreateSymbol(session, usage, strlen(usage));
 
-	option->session = session;	
+	option->session = session;
 	option->value = scCreateValue(session, type);
 	return (sc_option)option;
 }
-	
+
 sc_status
 scReleaseOption(
 	sc_option handle)
@@ -238,7 +238,7 @@ scReleaseOption(
 	sc_option_t* option = (sc_option_t*)handle;
 	if(!option)
 		return SC_INVALID_VALUE;
-		
+
 	if(option->name)
 		scReleaseSymbol(option->name);
 
@@ -250,7 +250,7 @@ scReleaseOption(
 
 
 	return scDeallocate(option->session, option);
-	
+
 }
 
 const char*
@@ -304,14 +304,14 @@ scParseCommandLineOptions(
     	return SC_OUT_OF_HOST_MEMORY;
 
 	memset(found, SC_FALSE, sizeof(sc_bool) * expected);
-	
-    for (i = 0; i < argc && argv && argv[i]; i++) 
+
+    for (i = 0; i < argc && argv && argv[i]; i++)
     {
 		for(o = 0; o < expected; o++)
     	{
 			if(found[o] == SC_TRUE)
     			continue;
-    			
+
     		const char* start = argv[i];
     		if(start[0] != '-')
     			continue;
@@ -327,32 +327,32 @@ scParseCommandLineOptions(
 				if(assign)
 				{
 					scDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s'\n", name, &assign[1]);
-	        	    
+
 	        	    ParseOption(&assign[1], options[o]);
-	        	    
+
 	        	    sc_value value = scGetOptionValue(options[o], NULL);
-	        	    
-					scDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s' -> '%s' (%s)\n", name, argv[i], 
+
+					scDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s' -> '%s' (%s)\n", name, argv[i],
 						scGetSymbolName(scCreateSymbolFromValue(session, value, NULL) ),
 						scGetTypeString(scGetValueType(value, NULL), NULL));
-					
+
 					found[o] = SC_TRUE;
 				}
 				else if(i + 1 < argc && argv[i + 1])
 				{
 					scDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s'\n", name, argv[i]);
-	        	    
+
 	        	    ParseOption(argv[i], options[o]);
-					
+
 					sc_value value = scGetOptionValue(options[o], NULL);
-	        	    
-					scDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s' -> '%s' (%s)\n", name, argv[i], 
+
+					scDebug(session, "ceParseCommandLineOptions: Parsed '%s' as '%s' -> '%s' (%s)\n", name, argv[i],
 						scGetSymbolName(scCreateSymbolFromValue(session, value, NULL) ),
 						scGetTypeString(scGetValueType(value, NULL), NULL));
-					
+
 					found[o] = SC_TRUE;
 				}
-				
+
 				if(found[o] == SC_TRUE)
 	        	    break;
     		}

@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,7 @@ HashString(const char *str)
 {
     int c;
     sc_uint hash = 5381;
-    
+
     while ((c = (*str++)) != 0)
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
@@ -61,8 +61,8 @@ HashString(const char *str)
 
 sc_symbol
 scCreateSymbol(
-	sc_session session, 
-	const char* name, 
+	sc_session session,
+	const char* name,
 	size_t length)
 {
 	sc_symbol_t* symbol;
@@ -74,17 +74,17 @@ scCreateSymbol(
 
 	length++;
 	symbol->name = scAllocate(session, sizeof(char) * length);
-    if(symbol->name) 
+    if(symbol->name)
     {
 	    snprintf(symbol->name, length, "%s", name);
     	symbol->length = length;
-		symbol->hash = HashString(name);    
+		symbol->hash = HashString(name);
 		symbol->session = session;
 
 	    scDebug(symbol->session, "Created symbol: name='%s' length='%d' hash='%u' session='%p'\n",
 	    		symbol->name, symbol->length, symbol->hash, symbol->session);
 	}
-    
+
     return (sc_symbol)symbol;
 }
 
@@ -161,23 +161,23 @@ scCreateSymbolFromValue(
 			break;
 		}
 		default:
-			return NULL;	
+			return NULL;
 	}
-	
+
 	if(count)
 		return scCreateSymbol(session, buffer, strlen(buffer));
 
-	return NULL;	
+	return NULL;
 }
 
 
-void 
+void
 scReleaseSymbol(
 	sc_symbol handle)
 {
 	sc_session session = NULL;
 	sc_symbol_t* symbol = (sc_symbol_t*)handle;
-	if(symbol && symbol->name) 
+	if(symbol && symbol->name)
 	{
 		session = symbol->session;
 		scDeallocate(session, symbol->name);
@@ -192,7 +192,7 @@ scIsSymbolNameEqual(
 {
 	if(!a || !b)
 		return SC_FALSE;
-		
+
 	return ( scGetSymbolHash(a) == scGetSymbolHash(b) );
 }
 
@@ -205,7 +205,7 @@ scGetSymbolName(
 	return symbol->name;
 }
 
-sc_uint 
+sc_uint
 scGetSymbolHash(
 	sc_symbol handle)
 {

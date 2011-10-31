@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "types.h"
 #include "values.h"
 #include "status.h"
- 
+
 /**************************************************************************************************/
 
 SC_EXTERN_C_BEGIN
@@ -51,10 +51,10 @@ SC_EXTERN_C_BEGIN
 #define scAllocate(session, size) 	scAllocateHostMemory(session, size, __FILE__ , __LINE__)
 #define scDeallocate(session, ptr) 	scDeallocateHostMemory(session, ptr)
 
-extern SC_API_EXPORT 
+extern SC_API_EXPORT
 void* scAllocateHostMemory(sc_session session, size_t bytes, char* filename, unsigned int line);
 
-extern SC_API_EXPORT sc_status 
+extern SC_API_EXPORT sc_status
 scDeallocateHostMemory(sc_session session, void* ptr);
 
 /**************************************************************************************************/
@@ -65,7 +65,7 @@ scEnableHostMemoryTracking(sc_session session);
 extern SC_API_EXPORT sc_status
 scDisableHostMemoryTracking(sc_session session);
 
-extern SC_API_EXPORT sc_status 
+extern SC_API_EXPORT sc_status
 scLogHostMemoryInfo(sc_session session);
 
 extern SC_API_EXPORT sc_status
@@ -74,7 +74,7 @@ scEnableDeviceMemoryTracking(sc_session session, cl_device_id device);
 extern SC_API_EXPORT sc_status
 scDisableDeviceMemoryTracking(sc_session session, cl_device_id device);
 
-extern SC_API_EXPORT void 
+extern SC_API_EXPORT void
 scLogDeviceMemoryInfo(sc_session session, cl_device_id device);
 
 extern SC_API_EXPORT sc_reference

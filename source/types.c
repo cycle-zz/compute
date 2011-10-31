@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ scGetTypeString(sc_type type, sc_uint* status)
 {
 	if(status)
 		(*status) = SC_SUCCESS;
-	
+
 	switch(type)
 	{
 		case SC_TYPE_INVALID: 				return "sc_invalid";
@@ -75,14 +75,14 @@ scGetTypeString(sc_type type, sc_uint* status)
 		{
 			if(status)
 				(*status) = SC_INVALID_TYPE;
-		
+
 			return "unknown type";
 		}
 	};
 
 	if(status)
 		(*status) = SC_INVALID_TYPE;
-	
+
 	return "unknown type";
 }
 

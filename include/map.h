@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "types.h"
 #include "values.h"
 #include "status.h"
- 
+
 /**************************************************************************************************/
 
 SC_EXTERN_C_BEGIN
@@ -52,16 +52,16 @@ SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-extern SC_API_EXPORT sc_map 
+extern SC_API_EXPORT sc_map
 scCreateMap(sc_session session, size_t size);
 
-extern SC_API_EXPORT void 
+extern SC_API_EXPORT void
 scReleaseMap(sc_map map);
 
 extern SC_API_EXPORT cl_int
 scMapInsert(sc_map map, sc_symbol key, sc_reference item);
 
-extern SC_API_EXPORT sc_reference 
+extern SC_API_EXPORT sc_reference
 scMapRemove(sc_map map, sc_symbol key);
 
 extern SC_API_EXPORT sc_reference

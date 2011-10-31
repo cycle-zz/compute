@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -53,18 +53,18 @@ typedef struct _sc_session_t {
 
 /**************************************************************************************************/
 
-static void 
+static void
 NotifyCallback(
 	const char *message, const void *handle, size_t handle_size, void *user_data)
 {
 	sc_session s = (sc_session)user_data;
-	
+
 	scError(s, CL_INVALID_VALUE, "Notified of unexpected error: %s\n", message);
-	if (handle_size > 0) 
+	if (handle_size > 0)
 	{
 		int ii;
 		scWarning(s, "  %d bytes of vendor data.", handle_size);
-		for (ii = 0; ii < handle_size; ii++) 
+		for (ii = 0; ii < handle_size; ii++)
 		{
 			char c = ((const char *) handle)[ii];
 			if (ii % 10 == 0) {
@@ -83,7 +83,7 @@ GetOpenCLDeviceType(
 {
 	if(status)
 		(*status) = SC_SUCCESS;
-	
+
 	switch(type)
 	{
 		case SC_DEVICE_TYPE_DEFAULT:		return CL_DEVICE_TYPE_DEFAULT;
@@ -95,21 +95,21 @@ GetOpenCLDeviceType(
 		{
 			if(status)
 				(*status) = SC_INVALID_TYPE;
-		
+
 			return 0;
 		}
 	};
 
 	if(status)
 		(*status) = SC_INVALID_TYPE;
-	
+
 	return 0;
 }
 
 static sc_status
 SetupOpenCLSessionForDeviceType(
 	sc_session handle,
-	sc_device_type device_type, 
+	sc_device_type device_type,
 	sc_uint device_count)
 {
     sc_status status = 0;
@@ -120,10 +120,10 @@ SetupOpenCLSessionForDeviceType(
 	cl_device_id *system_device_list = 0;
 	cl_platform_id system_platform = 0;
     size_t return_size = 0;
-    
+
     sc_session_t *session = (sc_session_t*)handle;
-	
-	system_status = clGetPlatformIDs(1, &system_platform, &system_platform_count); 
+
+	system_status = clGetPlatformIDs(1, &system_platform, &system_platform_count);
 	if (system_status != CL_SUCCESS || system_platform_count < 1)
 	{
 		scError(NULL, SC_INVALID_PLATFORM, "Failed to locate platform!\n");
@@ -136,27 +136,27 @@ SetupOpenCLSessionForDeviceType(
 		scError(NULL, SC_INVALID_DEVICE_TYPE, "Invalid compute device type specified!\n");
 		return SC_INVALID_DEVICE_TYPE;
 	}
-	
+
 	system_status = clGetDeviceIDs(system_platform, system_device_type, 0, NULL, &system_device_count);
 	if (system_status != CL_SUCCESS || system_device_count < 1)
 	{
 		scError(NULL, SC_DEVICE_NOT_AVAILABLE, "Failed to locate compute device!\n");
 		return SC_DEVICE_NOT_AVAILABLE;
 	}
-	
+
 	if(device_count)
 		system_device_count = system_device_count > device_count ? device_count : system_device_count;
-	
+
 	system_device_list = scAllocate(NULL, sizeof(cl_device_id) * device_count);
 	memset(system_device_list, 0, sizeof(cl_device_id) * device_count);
-	
+
 	system_status = clGetDeviceIDs(system_platform, system_device_type, system_device_count, system_device_list, &system_device_count);
 	if (system_status != CL_SUCCESS)
 	{
 		scError(NULL, SC_DEVICE_NOT_AVAILABLE, "Failed to locate compute device!\n");
 		return SC_DEVICE_NOT_AVAILABLE;
 	}
-	
+
 	session->context = clCreateContext(NULL, system_device_count, system_device_list, NotifyCallback, session, &system_status);
     if (!session->context)
     {
@@ -171,7 +171,7 @@ SetupOpenCLSessionForDeviceType(
         scError(handle, SC_INVALID_DEVICE, "Failed to retrieve compute devices for context!\n");
         return SC_INVALID_DEVICE;
     }
-    
+
     session->devices = system_device_list;
     session->units = system_device_count;
     session->queues = scAllocate(handle, sizeof(cl_command_queue) * session->units);
@@ -263,8 +263,8 @@ scCreateSessionForHost(void)
 
 sc_session
 scCreateSessionForDeviceType(
-	sc_device_type device_type, 
-	sc_uint device_count, 
+	sc_device_type device_type,
+	sc_uint device_count,
 	sc_status *status)
 {
 	sc_status result;
@@ -290,12 +290,12 @@ scReleaseSession(
             clFinish(session->queues[i]);
     }
 
-	if(session->mem) 
+	if(session->mem)
 		scReleaseMap(session->mem);
 
 	if(session->kernels)
 	    scReleaseMap(session->kernels);
-    
+
     if(session->programs)
 	    scReleaseMap(session->programs);
 
@@ -334,7 +334,7 @@ scGetLoggingInfo(
 	if(!scIsValidSession(handle))
 	{
 		if(status)
-			(*status) = SC_INVALID_SESSION;	
+			(*status) = SC_INVALID_SESSION;
 
 		return NULL;
 	}
@@ -351,7 +351,7 @@ scGetMemoryInfo(
 	if(!scIsValidSession(handle))
 	{
 		if(status)
-			(*status) = SC_INVALID_SESSION;	
+			(*status) = SC_INVALID_SESSION;
 
 		return NULL;
 	}
@@ -368,7 +368,7 @@ scGetProfilingInfo(
 	if(!scIsValidSession(handle))
 	{
 		if(status)
-			(*status) = SC_INVALID_SESSION;	
+			(*status) = SC_INVALID_SESSION;
 
 		return NULL;
 	}

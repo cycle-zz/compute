@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,7 @@ typedef struct _sc_memory_block_t
 	struct _sc_memory_block_t* 			next;
 } sc_memory_block_t;
 
-typedef struct _sc_memory_info_t 
+typedef struct _sc_memory_info_t
 {
 	size_t 								allocations;
 	size_t 								deallocations;
@@ -78,9 +78,9 @@ typedef struct _sc_memory_info_t
 
 /**************************************************************************************************/
 
-static void 
+static void
 InsertBlock (
-	sc_memory_info_t *info, 
+	sc_memory_info_t *info,
 	sc_memory_block_t* block)
 {
     if (info->tail_block)
@@ -100,9 +100,9 @@ InsertBlock (
 }
 
 
-static void 
+static void
 RemoveBlock (
-	sc_memory_info_t *info, 
+	sc_memory_info_t *info,
 	sc_memory_block_t* block)
 {
     if (block->prev)
@@ -113,7 +113,7 @@ RemoveBlock (
     {
         info->head_block = block->next;
     }
-    
+
     if (block->next)
     {
         block->next->prev = block->prev;
@@ -150,11 +150,11 @@ HostFree(void* ptr)
 
 /**************************************************************************************************/
 
-void* 
+void*
 scAllocateHostMemory (
 	sc_session handle,
-	size_t bytes, 
-	char* filename, 
+	size_t bytes,
+	char* filename,
 	unsigned int line)
 {
 	sc_memory_info_t* memory = handle ? (sc_memory_info_t*)scGetMemoryInfo(handle, NULL) : NULL;
@@ -216,13 +216,13 @@ scAllocateHostMemory (
             info->histogram[i]++;
         }
     }
-	
+
     return (void*)ptr;
 }
 
 sc_status
 scDeallocateHostMemory(
-	sc_session handle, 
+	sc_session handle,
 	void* ptr)
 {
 	sc_memory_info_t* memory = handle ? (sc_memory_info_t*)scGetMemoryInfo(handle, NULL) : NULL;
@@ -232,7 +232,7 @@ scDeallocateHostMemory(
 		HostFree(ptr);
 		return SC_SUCCESS;
 	}
-	
+
     if (ptr == NULL)
     {
         return SC_INVALID_VALUE;
@@ -244,20 +244,20 @@ scDeallocateHostMemory(
     {
     	if(block->reference->count)
 		{
-	#if defined(SC_64BIT) 
+	#if defined(SC_64BIT)
 			scAtomicAddLong(&block->reference->count, -1);
 	#else
 			scAtomicAddInt(&block->reference->count, -1);
 	#endif
 		}
-		
+
     	if(block->reference->count)
-			return SC_SUCCESS;		
-			
+			return SC_SUCCESS;
+
 		HostFree(block->reference);
 		block->reference = NULL;
 	}
-    	
+
 	info->deallocations++;
     RemoveBlock(info, block);
 
@@ -284,11 +284,11 @@ scCreateReference(
 	sc_memory_info_t* info = memory ? ((sc_memory_info_t*)&memory[0]) : NULL;
 	if(info == NULL)
 		return NULL;
-	
+
     volatile sc_memory_block_t* block = (sc_memory_block_t*)(ptr - sizeof(sc_memory_block_t));
     if(block == NULL)
     	return NULL;
-    	
+
     if(!block->reference)
     {
     	block->reference = (sc_reference_t*)malloc(sizeof(sc_reference_t));
@@ -297,8 +297,8 @@ scCreateReference(
 		block->reference->session = handle;
 		block->reference->ptr = ptr;
     }
-    
-#if defined(SC_64BIT) 
+
+#if defined(SC_64BIT)
 	scAtomicAddLong(&(block->reference->count), 1);
 #else
 	scAtomicAddInt(&(block->reference->count), 1);
@@ -306,9 +306,9 @@ scCreateReference(
 	return (sc_reference)block->reference;
 }
 
-sc_status 
+sc_status
 scRetain(
-	sc_session handle, 
+	sc_session handle,
 	sc_reference reference)
 {
 	sc_memory_info_t* memory = handle ? (sc_memory_info_t*)scGetMemoryInfo(handle, NULL) : NULL;
@@ -322,7 +322,7 @@ scRetain(
     volatile sc_memory_block_t* block = (sc_memory_block_t*)(ptr - sizeof(sc_memory_block_t));
 	if(!block)
 		return SC_INVALID_MEMORY_INFO;
-    
+
     if(!block->reference)
     {
     	block->reference = (sc_reference_t*)malloc(sizeof(sc_reference_t));
@@ -331,8 +331,8 @@ scRetain(
 		block->reference->session = handle;
 		block->reference->ptr = ptr;
     }
-	
-#if defined(SC_64BIT) 
+
+#if defined(SC_64BIT)
 	scAtomicAddLong(&(block->reference->count), 1);
 #else
 	scAtomicAddInt(&(block->reference->count), 1);
@@ -361,7 +361,7 @@ scLogHostMemoryInfo(
 		scWarning(handle, "Host memory tracking not enabled!");
 		return SC_INVALID_MEMORY_INFO;
 	}
-		
+
 	size_t index = 0;
     size_t named_block_count = 0;
     size_t named_byte_count = 0;

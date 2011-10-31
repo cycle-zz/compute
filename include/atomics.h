@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -81,18 +81,18 @@ SC_EXTERN_C_BEGIN
 
 /**************************************************************************************************/
 
-SC_INLINE sc_int 
+SC_INLINE sc_int
 scAtomicAddInt(
-	sc_atomic_int *v, 
-	sc_int delta) 
+	sc_atomic_int *v,
+	sc_int delta)
 {
 #if defined(SC_PLATFORM_WINDOWS)
 	#if defined(SC_64BIT)
-    	
+
     	return InterlockedAdd(v, delta);
-    	
+
 	#else
-		
+
 		sc_int result;
 		_ReadWriteBarrier();
 		__asm {
@@ -101,27 +101,27 @@ scAtomicAddInt(
 			__asm lock xadd [edx], eax
 			__asm mov result, eax
 		}
-		
+
 		_ReadWriteBarrier();
 		return result + delta;
-	
+
 	#endif
 #elif defined(SC_PLATFORM_MACOSX) && defined(SC_ARCH_PPC)
 
     return OSAtomicAdd32Barrier(delta, v);
 
 #else
-    
+
     sc_int result;
-    
+
     __asm__ __volatile__(
     	"lock\n"
 		"xaddl %0,%1"
 	   : "=r"(result), "=m"(*v) : "0"(delta)
 	   : "memory");
-                         
+
     return result + delta;
-    
+
 #endif
 }
 
@@ -130,10 +130,10 @@ scAtomicAddInt(
 
 #if defined(SC_64BIT)
 
-SC_INLINE sc_long 
+SC_INLINE sc_long
 scAtomicAddLong(
-	sc_atomic_long *v, 
-	sc_long delta) 
+	sc_atomic_long *v,
+	sc_long delta)
 {
 #if defined(SC_PLATFORM_WINDOWS)
 
@@ -159,12 +159,12 @@ scAtomicAddLong(
 #endif
 
 /**************************************************************************************************/
-    
-SC_INLINE sc_int 
+
+SC_INLINE sc_int
 scAtomicCompareAndSwapInt(
-	sc_atomic_int *v, 
-	sc_int new_value, 
-	sc_int old_value) 
+	sc_atomic_int *v,
+	sc_int new_value,
+	sc_int old_value)
 {
 
 #if defined(SC_PLATFORM_WINDOWS)
@@ -192,11 +192,11 @@ scAtomicCompareAndSwapInt(
 /**************************************************************************************************/
 
 #if defined(SC_64BIT)
-SC_INLINE sc_long 
+SC_INLINE sc_long
 scAtomicCompareAndSwapLong(
-	sc_atomic_long *v, 
-	sc_long new_value, 
-	sc_long old_value) 
+	sc_atomic_long *v,
+	sc_long new_value,
+	sc_long old_value)
 {
 
 #if defined(SC_PLATFORM_WINDOWS)
@@ -216,7 +216,7 @@ scAtomicCompareAndSwapLong(
  	  : "=a"(result), "=m"(*v)
 	  : "q"(new_value), "0"(old_value)
 	  : "memory");
-	  
+
     return result;
 
 #endif
@@ -227,9 +227,9 @@ scAtomicCompareAndSwapLong(
 
 SC_INLINE void*
 scAtomicCompareAndSwapPtr(
-	void **v, 
-	void *new_value, 
-	void *old_value) 
+	void **v,
+	void *new_value,
+	void *old_value)
 {
 
 #if defined(SC_PLATFORM_WINDOWS)
@@ -269,16 +269,16 @@ scAtomicCompareAndSwapPtr(
 #endif /* SC_64BIT */
 
     return result;
-    
+
 #endif
 }
 
 /**************************************************************************************************/
 
-SC_INLINE sc_float 
+SC_INLINE sc_float
 scAtomicAddFloat(
-	volatile sc_float *val, 
-	sc_float delta) 
+	volatile sc_float *val,
+	sc_float delta)
 {
     typedef union _sc_bits_t { sc_float f; sc_int i; } sc_bits_t;
     sc_bits_t old_value, new_value;
@@ -291,7 +291,7 @@ scAtomicAddFloat(
         new_value.f = old_value.f + delta;
 
     } while (scAtomicCompareAndSwapInt(((sc_atomic_int *)val), new_value.i, old_value.i) != old_value.i);
-    
+
     return new_value.f;
 }
 

@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	#define scSubtractTimeInSeconds(delta, freq, a, b) do {					\
 			delta = (b).LowPart ? (((double)(a).QuadPart - (double)(b).QuadPart) / (double)(freq).QuadPart) : 0.0; \
 		} while (0)
-		
+
 	#define scAssignTimeValue(dst, src) do { 								\
 			(dst) = (src)c; 												\
 		} while (0)
@@ -51,13 +51,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	#define scGetCurrentTime(dst) do { 										\
         	(dst) = mach_absolute_time(); 									\
 		} while (0)
-		
+
 	#define scSubtractTimeInSeconds(delta, freq, a, b) do {					\
 			sc_time difference = (a) - (b);									\
 			delta = 1e-9 * (double) (freq).numer / (double) (freq).denom;	\
 			delta = delta * difference;										\
 		} while (0)
-		
+
 	#define scAssignTimeValue(dst, src) do { 								\
 			(dst) = (src);	 												\
 		} while (0)
@@ -68,12 +68,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 			delta = ((double)(a).tv_sec + 1.0e-6 * (double)(a).tv_usec);	\
 			delta -= ((double)(b).tv_sec + 1.0e-6 * (double)(b).tv_usec);   \
 		} while (0)
-		
+
 	#define scAssignTimeValue(dst, src) do { 								\
 			(dst).tv_sec = (src).tv_sec; 									\
 			(dst).tv_usec = (src).tv_usec; 									\
 		} while (0)
-		
+
 #endif
 
 /**************************************************************************************************/
@@ -87,7 +87,7 @@ typedef struct _sc_profiling_info_t {
 
 /**************************************************************************************************/
 
-sc_frequency 
+sc_frequency
 scGetTimerFrequencyForHost(
 	sc_session handle, sc_status *status)
 {
@@ -98,15 +98,15 @@ scGetTimerFrequencyForHost(
 	sc_profiling_info_t* profiling = (sc_profiling_info_t*)scGetProfilingInfo(handle, NULL);
 	if(profiling && profiling->initialized)
 		return profiling->frequency;
-		
+
 #if defined(SC_PLATFORM_WINDOWS)
 
-	QueryPerformanceFrequency(&(frequency));							
+	QueryPerformanceFrequency(&(frequency));
 
 #elif defined(SC_PLATFORM_MACOSX)
 
 	mach_timebase_info(&(frequency));
-	
+
 #elif defined(SC_PLATFORM_LINUX)
 
 	frequency = 1.0;
@@ -129,17 +129,17 @@ scGetCurrentTimeForHost(
 {
 	(void)handle;
 	if(status)(*status) = SC_SUCCESS;
-	
+
 	sc_time current;
-	
+
 #if defined(SC_PLATFORM_WINDOWS)
 
-	QueryPerformanceCounter(&(current));							
+	QueryPerformanceCounter(&(current));
 
 #elif defined(SC_PLATFORM_MACOSX)
 
 	current = mach_absolute_time();
-	
+
 #elif defined(SC_PLATFORM_LINUX)
 
 	gettimeofday&(current), NULL);
@@ -152,7 +152,7 @@ scGetCurrentTimeForHost(
 
 sc_double
 scGetTimeDeltaForHost(
-	sc_session handle, 
+	sc_session handle,
 	sc_uint counter,
 	sc_status *status)
 {
@@ -167,7 +167,7 @@ scGetTimeDeltaForHost(
 		scWarning(handle, "Profiling not enabled! Unable to get time delta for host!\n");
 		return 0.0;
 	}
-	
+
 	current = scGetCurrentTimeForHost(handle, status);
 	frequency = scGetTimerFrequencyForHost(handle, status);
 
@@ -182,7 +182,7 @@ scGetTimeDeltaForHost(
 		if(status)(*status) = SC_INVALID_VALUE;
 	}
 	return delta;
-} 
+}
 
 /**************************************************************************************************/
 

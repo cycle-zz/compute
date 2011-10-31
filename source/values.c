@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwva->edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwva->edu.au>
 The University of Western Australiva-> All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,7 @@ scCreateValue(
 	sc_value_t* value = scAllocate(session, sizeof(sc_value_t));
 	if(!value)
 		return NULL;
-		
+
 	memset(value, 0, sizeof(sc_value_t));
 	value->type = type;
 	return (sc_value)value;
@@ -185,7 +185,7 @@ scReleaseValue(
 	sc_value_t* value = (sc_value_t*)handle;
 	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type == SC_TYPE_SYMBOL && value->data.as_symbol)
 		scReleaseSymbol(value->data.as_symbol);
 
@@ -197,12 +197,12 @@ scSetBoolValue(
 	sc_value handle, sc_bool data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_BOOL)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_bool = data;
 	return SC_SUCCESS;
 }
@@ -217,13 +217,13 @@ scGetBoolValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_BOOL)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return -1;
 	}
-	
+
 	return value->data.as_bool;
 }
 
@@ -232,12 +232,12 @@ scSetCharValue(
 	sc_value handle, sc_char data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_CHAR)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_char = data;
 	return SC_SUCCESS;
 }
@@ -252,13 +252,13 @@ scGetCharValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_CHAR)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return -1;
 	}
-	
+
 	return value->data.as_char;
 }
 
@@ -267,12 +267,12 @@ scSetUCharValue(
 	sc_value handle, sc_uchar data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_UCHAR)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_uchar = data;
 	return SC_SUCCESS;
 }
@@ -287,7 +287,7 @@ scGetUCharValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_UCHAR)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
@@ -303,12 +303,12 @@ scSetShortValue(
 	sc_value handle, sc_short data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_SHORT)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_short = data;
 	return SC_SUCCESS;
 }
@@ -323,13 +323,13 @@ scGetShortValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_SHORT)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return -1;
 	}
-	
+
 	return value->data.as_short;
 }
 
@@ -338,12 +338,12 @@ scSetUShortValue(
 	sc_value handle, sc_ushort data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_USHORT)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_ushort = data;
 	return SC_SUCCESS;
 }
@@ -358,13 +358,13 @@ scGetUShortValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_USHORT)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return -1;
 	}
-	
+
 	return value->data.as_ushort;
 }
 
@@ -373,18 +373,18 @@ scSetIntValue(
 	sc_value handle, sc_int data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_INT)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_int = data;
 	return SC_SUCCESS;
 }
 
 sc_int
-scGetIntValue(	
+scGetIntValue(
 	sc_value handle, sc_status *status)
 {
 	sc_value_t* value = (sc_value_t*)handle;
@@ -393,13 +393,13 @@ scGetIntValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_INT)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return -1;
 	}
-	
+
 	return value->data.as_int;
 }
 
@@ -409,12 +409,12 @@ scSetUIntValue(
 	sc_value handle, sc_uint data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_UINT)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_uint = data;
 	return SC_SUCCESS;
 }
@@ -429,13 +429,13 @@ scGetUIntValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_UINT)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return -1;
 	}
-	
+
 	return value->data.as_uint;
 }
 
@@ -444,12 +444,12 @@ scSetLongValue(
 	sc_value handle, sc_long data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_LONG)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_long = data;
 	return SC_SUCCESS;
 }
@@ -464,13 +464,13 @@ scGetLongValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_LONG)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return -1;
 	}
-	
+
 	return value->data.as_long;
 }
 
@@ -479,12 +479,12 @@ scSetULongValue(
 	sc_value handle, sc_ulong data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_ULONG)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_ulong = data;
 	return SC_SUCCESS;
 }
@@ -499,13 +499,13 @@ scGetULongValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_ULONG)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return -1;
 	}
-	
+
 	return value->data.as_ulong;
 }
 
@@ -514,12 +514,12 @@ scSetFloatValue(
 	sc_value handle, sc_float data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_FLOAT)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_float = data;
 	return SC_SUCCESS;
 }
@@ -534,13 +534,13 @@ scGetFloatValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_FLOAT)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return -1;
 	}
-	
+
 	return value->data.as_float;
 }
 
@@ -549,12 +549,12 @@ scSetDoubleValue(
 	sc_value handle, sc_double data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_DOUBLE)
 		return SC_TYPE_MISMATCH;
-		
+
 	value->data.as_double = data;
 	return SC_SUCCESS;
 }
@@ -569,13 +569,13 @@ scGetDoubleValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return -1;
 	}
-	
+
 	if(value->type != SC_TYPE_DOUBLE)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return -1;
 	}
-	
+
 	return value->data.as_double;
 }
 
@@ -585,15 +585,15 @@ scSetSymbolValue(
 	sc_value handle, sc_symbol data)
 {
 	sc_value_t* value = (sc_value_t*)handle;
-	if(!value) 
+	if(!value)
 		return SC_INVALID_VALUE;
-		
+
 	if(value->type != SC_TYPE_SYMBOL)
 		return SC_TYPE_MISMATCH;
 
 	if(value->data.as_symbol)
 		scReleaseSymbol(value->data.as_symbol);
-		
+
 	value->data.as_symbol = scCreateSymbol(SC_DEFAULT_SESSION, scGetSymbolName(data), scGetSymbolLength(data));
 	return SC_SUCCESS;
 }
@@ -608,7 +608,7 @@ scGetSymbolValue(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return 0;
 	}
-	
+
 	if(value->type != SC_TYPE_SYMBOL)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
@@ -628,7 +628,7 @@ scGetValueType(
 		if(status) (*status) = SC_INVALID_VALUE;
 		return SC_INVALID_TYPE;
 	}
-	
+
 	return value->type;
 }
 
@@ -642,13 +642,13 @@ scIsValueEqual(sc_value a, sc_value b, sc_status* status)
 		if(status) (*status) = SC_INVALID_VALUE;
 		return SC_INVALID_TYPE;
 	}
-	
+
 	if(va->type != vb->type)
 	{
 		if(status) (*status) = SC_TYPE_MISMATCH;
 		return SC_FALSE;
 	}
-		
+
 	switch(va->type)
 	{
 		case (SC_TYPE_BOOL):
@@ -701,10 +701,10 @@ scIsValueEqual(sc_value a, sc_value b, sc_status* status)
 			}
 			break;
 		default:
-			return SC_FALSE;	
+			return SC_FALSE;
 	}
-	
-	return SC_FALSE;	
+
+	return SC_FALSE;
 }
 
 /**************************************************************************************************/

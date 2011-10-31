@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**************************************************************************************************/
 
 typedef struct _sc_stack_node_t {
-  struct _sc_stack_node_t*		next; 
+  struct _sc_stack_node_t*		next;
   sc_reference	 				item;
   sc_reference	 				reference;
 } sc_stack_node_t;
@@ -50,7 +50,7 @@ typedef struct _sc_stack_t {
 
 /**************************************************************************************************/
 
-static sc_stack_node_t* 
+static sc_stack_node_t*
 CreateStackNode(
 	sc_session session,
 	sc_reference item)
@@ -62,13 +62,13 @@ CreateStackNode(
 	return node;
 }
 
-sc_stack 
+sc_stack
 scCreateStack(
 	sc_session session)
 {
 	sc_stack_t* stack = scAllocate(session, sizeof(sc_stack_t));
 	memset(stack, 0, sizeof(sc_stack_t));
-	
+
 	stack->session = session;
 	stack->head = CreateStackNode(session, NULL);
 	return (sc_stack)stack;
@@ -86,7 +86,7 @@ scReleaseStack(
 	return scDeallocate(stack->session, stack);
 }
 
-void 
+void
 cePushStack(
 	sc_stack handle,
 	sc_reference item)
@@ -96,26 +96,26 @@ cePushStack(
 	do {
 		node = stack->head->next;
 	}
-	while( !scAtomicCompareAndSwapPtr((void**)&(stack->head->next), node->next, node) ); 
+	while( !scAtomicCompareAndSwapPtr((void**)&(stack->head->next), node->next, node) );
 }
 
-sc_reference 
+sc_reference
 cePopStack(
 	sc_stack handle)
 {
 	sc_stack_t* stack = (sc_stack_t*)(handle);
 	sc_stack_node_t* node = NULL;
 	sc_reference item = NULL;
-	
+
 	do {
 		node = stack->head->next;
-		if(node == NULL) 
+		if(node == NULL)
 			return item;
-	} 
-	while( !scAtomicCompareAndSwapPtr((void**)&(stack->head->next), node, node->next) ); 
-	
+	}
+	while( !scAtomicCompareAndSwapPtr((void**)&(stack->head->next), node, node->next) );
+
 	item = node->item;
-	scRelease(stack->session, node->reference);	
+	scRelease(stack->session, node->reference);
 	return item;
 }
 

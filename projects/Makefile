@@ -107,15 +107,15 @@ ifeq ($(LIB_CONFIG),static)
 	LIB_FILE	:= $(TGT_STATIC_LIB)
 	DEFINES		+= -DCE_STATIC_LIB_TARGET
 else
-	LIB_FILE	:= $(TGT_SHARED_LIB)	
-	DEFINES		+= -DCE_SHARED_LIB_TARGET -DCE_SHARED_LIB_EXPORT 
+	LIB_FILE	:= $(TGT_SHARED_LIB)
+	DEFINES		+= -DCE_SHARED_LIB_TARGET -DCE_SHARED_LIB_EXPORT
 	ifeq ($(OS_NAME),Darwin)
 		LDFLAGS		+= -flat_namespace -undefined suppress -bundle -noprebind
 	endif
 endif
 
 BUILD_OPTIONS 	:= -c -Wall -std=c99
-CFLAGS 			:= $(BUILD_OPTIONS) $(DEFINES) $(ARCH_FLAGS) $(OPT_FLAGS) $(DBG_FLAGS) $(INCLUDE) 
+CFLAGS 			:= $(BUILD_OPTIONS) $(DEFINES) $(ARCH_FLAGS) $(OPT_FLAGS) $(DBG_FLAGS) $(INCLUDE)
 
 # Target Rules #####################################################################################
 
@@ -128,15 +128,15 @@ release:
 	$(MAKE) $(MAKEFILE) TARGET=Release
 
 Debug:
-	$(MAKE) $(MAKEFILE) TARGET=Debug 
+	$(MAKE) $(MAKEFILE) TARGET=Debug
 
 debug:
-	$(MAKE) $(MAKEFILE) TARGET=Debug 
+	$(MAKE) $(MAKEFILE) TARGET=Debug
 
 shared: $(TGT_SHARED_LIB)
 
 shared-debug:
-	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared TARGET=Debug 
+	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared TARGET=Debug
 
 shared-release:
 	$(MAKE) $(MAKEFILE) LIB_CONFIG=shared TARGET=Release
@@ -144,12 +144,12 @@ shared-release:
 static: $(TGT_STATIC_LIB)
 
 static-debug:
-	$(MAKE) $(MAKEFILE) LIB_CONFIG=static TARGET=Debug 
+	$(MAKE) $(MAKEFILE) LIB_CONFIG=static TARGET=Debug
 
 static-release:
 	$(MAKE) $(MAKEFILE) LIB_CONFIG=static TARGET=Release
 
-$(LIB_FILE): $(TGT_BUILD_DIR) $(TGT_LIB_DIR)  
+$(LIB_FILE): $(TGT_BUILD_DIR) $(TGT_LIB_DIR)
 
 $(TGT_LIB_DIR):
 	@echo "Creating target directory '$(TGT_LIB_DIR)'"
@@ -162,12 +162,12 @@ $(TGT_BUILD_DIR):
 $(TST_BIN_DIR):
 	@echo "Creating test bin directory '$(TST_BIN_DIR)'"
 	@$(MKDIR) -p $(TST_BIN_DIR)
-	
+
 $(TGT_BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo "Building object '$@'"
 	@$(CC) $(CFLAGS) -o $@ -c $<
 
-$(TGT_SHARED_LIB): $(TGT_LIB_DIR) $(TGT_BUILD_DIR) $(OBJ_FILES) 
+$(TGT_SHARED_LIB): $(TGT_LIB_DIR) $(TGT_BUILD_DIR) $(OBJ_FILES)
 	@echo "Linking library '$@'"
 	@$(LD) -o $@  $(OBJ_FILES) -dynamic $(LDFLAGS) $(LIBPATH) $(LIBRARIES)
 
@@ -179,14 +179,14 @@ depend: dep
 
 dep:
 	makedepend -- $(CFLAGS) -- $(SRC_FILES)
-	
+
 clobber: clean
 	@echo "Clobbering..."
 	@$(RM) -rf $(BUILD_DIR)/*
 	@$(RM) -rf $(LIB_DIR)/*
 	@$(RM) -rf $(BIN_DIR)/*
 
-clean: 
+clean:
 	@echo "Cleaning..."
 	@$(RM) -f $(BUILD_DIR)/*/*.o
 	@$(RM) -f $(TST_DIR)/*/*.o
@@ -194,15 +194,15 @@ clean:
 	@$(RM) -f $(BIN_DIR)/*/*/*/*
 
 .DEFAULT:
-	@echo The target \"$@\" does not exist in this Makefile.	
+	@echo The target \"$@\" does not exist in this Makefile.
 
 # Test Rules #######################################################################################
- 
+
 tests: $(LIB_FILE) $(TST_BIN_DIR) $(TST_BIN_DIR)/options $(TST_BIN_DIR)/session
 
 $(TST_BIN_DIR)/options: $(TST_DIR)/options/main.o
 	@echo "Linking $@"
-	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LDFLAGS) $(LIBPATH) $(LIBRARIES) $(LIB_FILE) $(LIBS) 
+	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LDFLAGS) $(LIBPATH) $(LIBRARIES) $(LIB_FILE) $(LIBS)
 
 $(TST_DIR)/options/main.o: $(TST_DIR)/options/main.c
 	@echo "Building object '$@'"
@@ -210,14 +210,14 @@ $(TST_DIR)/options/main.o: $(TST_DIR)/options/main.c
 
 $(TST_BIN_DIR)/session: $(TST_DIR)/session/main.o
 	@echo "Linking $@"
-	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LDFLAGS) $(LIBPATH) $(LIBRARIES) $(LIB_FILE) $(LIBS) 
+	@$(CC) $(ARCH_FLAGS) $< -o $@  $(LDFLAGS) $(LIBPATH) $(LIBRARIES) $(LIB_FILE) $(LIBS)
 
 $(TST_DIR)/session/main.o: $(TST_DIR)/session/main.c
 	@echo "Building object '$@'"
 	@$(CC) $(CFLAGS) -o $@ -c $<
 
 
-	
+
 # DO NOT DELETE
 
 
