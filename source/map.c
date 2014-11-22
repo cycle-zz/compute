@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmanext <derek.gerstmanext[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmanext <derek.gerstmanext[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef unsigned short sc_map_index_t;
 
 typedef struct _sc_map_node_t {
-    struct _sc_map_node_t* 	next; 
+    struct _sc_map_node_t* 	next;
     sc_symbol 					key;
     sc_reference				item;
 } sc_map_node_t;
@@ -63,15 +63,15 @@ scCreateMap(
 {
 	sc_map_t *map;
 	size_t bytes;
-	
+
 	map = scAllocate(session, sizeof(sc_map_t));
 	map->size = 0;
-	
+
 	bytes = size * sizeof(sc_map_node_t *);
 	map->bins = scAllocate(session, bytes);
 	if(!map->bins)
 		return 0;
-    
+
     memset(map->bins, 0, bytes);
     map->size = size;
     map->session = session;
@@ -88,7 +88,7 @@ scReleaseMap(
 
 	sc_map_t* map = (sc_map_t*)handle;
 	sc_session session = map->session;
-	
+
 	while(index < map->size)
 	{
 		node = map->bins[index++];
@@ -100,15 +100,15 @@ scReleaseMap(
 			node = node->next;
 		}
     }
-	
+
 	scDeallocate(session, map->bins);
 	scDeallocate(session, map);
 }
 
 cl_int
 scMapInsert(
-	sc_map handle, 
-	sc_symbol key, 
+	sc_map handle,
+	sc_symbol key,
 	sc_reference item)
 {
     sc_map_node_t *node = NULL;
@@ -116,10 +116,10 @@ scMapInsert(
     sc_map_index_t index = 0;
 
 	sc_map_t* map = (sc_map_t*)handle;
-	
+
 	index = scGetSymbolHash(key) % map->size;
 
-    if ((node = scAllocate(map->session, sizeof(sc_map_node_t))) == 0) 
+    if ((node = scAllocate(map->session, sizeof(sc_map_node_t))) == 0)
     	return 0;
 
     scRetain(map->session, item);
@@ -133,9 +133,9 @@ scMapInsert(
     return CL_SUCCESS;
 }
 
-sc_reference 
+sc_reference
 scMapRemove(
-	sc_map handle, 
+	sc_map handle,
 	sc_symbol key)
 {
     sc_map_node_t *node = NULL;
@@ -144,7 +144,7 @@ scMapRemove(
     sc_reference item = NULL;
 
 	sc_map_t* map = (sc_map_t*)handle;
-	
+
     index = scGetSymbolHash(key) % map->size;
     node = map->bins[index];
 
@@ -153,7 +153,7 @@ scMapRemove(
         node = node->next;
     }
 
-    if (!node) 
+    if (!node)
     	return NULL;
 
     if (next)
@@ -171,7 +171,7 @@ scMapRemove(
 
 sc_reference
 scGetMapItem(
-	sc_map handle, 
+	sc_map handle,
 	sc_symbol key)
 {
     sc_map_node_t *node = NULL;
@@ -182,7 +182,7 @@ scGetMapItem(
 	index = scGetSymbolHash(key) % map->size;
     node = map->bins[index];
 
-    while (node && !scMapCompare(node->key, key)) 
+    while (node && !scMapCompare(node->key, key))
     {
 		if(node && node->item)
 		{

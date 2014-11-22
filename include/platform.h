@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -86,9 +86,9 @@ SC_EXTERN_C_BEGIN
 
 #if defined(SC_PLATFORM_WINDOWS)
 	#if defined(SC_SHARED_LIB_TARGET) && defined(SC_SHARED_LIB_EXPORT)
-		#define SC_API_EXPORT 				__declspec(dllexport) 
+		#define SC_API_EXPORT 				__declspec(dllexport)
 	#elif defined(SC_SHARED_LIB_TARGET)
-		#define SC_API_EXPORT 				__declspec(dllimport) 
+		#define SC_API_EXPORT 				__declspec(dllimport)
 	#endif
 #else
 	#define SC_API_EXPORT
@@ -113,11 +113,11 @@ SC_EXTERN_C_BEGIN
 /* alignment detection *********************************************************/
 
 #if defined(__GNUC__)
-	#define SC_DECLARE_ALIGNED(x) 
+	#define SC_DECLARE_ALIGNED(x)
 	#define SC_ALIGN_ATTRIBUTE(x) __attribute__ ((aligned(x)))
 #elif defined(_MSC_VER)
-	#define SC_DECLARE_ALIGNED(x) __declspec(align( x )) 
-	#define SC_ALIGN_ATTRIBUTE(x) 
+	#define SC_DECLARE_ALIGNED(x) __declspec(align( x ))
+	#define SC_ALIGN_ATTRIBUTE(x)
 #else
 	#define SC_DECLARE_ALIGNED(x)
 	#define SC_ALIGN_ATTRIBUTE(x)

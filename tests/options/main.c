@@ -10,16 +10,16 @@ main(int argc, char *argv[])
 {
 	char *progname;
 	progname = argv[0];
-	
+
 	sc_uint i = 0;
 	sc_uint count = 0;
   	sc_option options[16];
 
 	sc_uint test_argc = 0;
 	const char* test_argv[16];
-	
+
 	sc_session session = scCreateSessionForHost();
-	
+
 	test_value_t values[] = {
 		{ "--symbol=symbol",  	scCreateSymbolValue(session, scCreateSymbol(session, "symbol", strlen("symbol")) ),  },
 		{ "--bool=true", 		scCreateBoolValue(session, SC_TRUE)   	},
@@ -35,7 +35,7 @@ main(int argc, char *argv[])
 		{ "--double=42.0",  	scCreateDoubleValue(session, 	42.0) 	},
 	};
 	test_argc = sizeof(values) / sizeof(test_value_t);
-	
+
 	for(i = 0; i < test_argc; i++)
 		test_argv[i] = values[i].flag;
 
@@ -55,25 +55,25 @@ main(int argc, char *argv[])
   	count = i;
 
   	scParseCommandLineOptions(session, count, test_argv, count, options);
-  	
+
   	sc_status status = 0;
   	for(i = 0; i < count; i++)
   	{
   		sc_value parsed = scGetOptionValue(options[i], NULL);
   		sc_value expected = values[i].value;
-	
-		scInfo(session, "Option[%3d]: name='%s' parsed='%s'(%s) expected='%s'(%s)\n", i, 
-			scGetOptionName(options[i], &status), 
-			scGetSymbolName(scCreateSymbolFromValue(session, parsed,    &status)), 
-			scGetTypeString(scGetValueType(parsed, &status), &status), 
+
+		scInfo(session, "Option[%3d]: name='%s' parsed='%s'(%s) expected='%s'(%s)\n", i,
+			scGetOptionName(options[i], &status),
+			scGetSymbolName(scCreateSymbolFromValue(session, parsed,    &status)),
+			scGetTypeString(scGetValueType(parsed, &status), &status),
 			scGetSymbolName(scCreateSymbolFromValue(session, expected,  &status)),
 			scGetTypeString(scGetValueType(expected, &status), &status));
-  		
+
   		scAssert(scIsValueEqual(parsed, expected, &status));
   	}
-  	
+
   	for(i = 0; i < count; i++)
   		scReleaseOption(options[i]);
-  	
+
 	return 0;
 }

@@ -32,7 +32,7 @@ TestSessionForDeviceType(sc_uint type)
 		scTest(NULL, "PASSED!\n");
 		return SC_SUCCESS;
 	}
-	
+
 	scTest(NULL, "FAILED!\n");
 	return SC_INVALID_SESSION;
 }
@@ -42,20 +42,20 @@ main(int argc, char *argv[])
 {
 	char *progname;
 	progname = argv[0];
-		  
+
 	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
-	
+
 	scAssert(TestSessionForHost() == SC_SUCCESS);
 	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
-	
+
 	scAssert(TestSessionForDeviceType(SC_DEVICE_TYPE_ALL) == SC_SUCCESS);
 	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
-	
+
 	scAssert(TestSessionForDeviceType(SC_DEVICE_TYPE_GPU) == SC_SUCCESS);
 	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
-	
+
 	scAssert(TestSessionForDeviceType(SC_DEVICE_TYPE_CPU) == SC_SUCCESS);
 	scTest(NULL, "%s\n", SC_LOG_SEPARATOR);
-  	
+
 	return 0;
 }

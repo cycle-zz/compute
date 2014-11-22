@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**************************************************************************************************/
 
 #include "compute.h"
- 
+
 /**************************************************************************************************/
 
 SC_EXTERN_C_BEGIN
@@ -51,7 +51,7 @@ scCreateSymbol(sc_session session, const char* name, size_t length);
 extern SC_API_EXPORT sc_symbol
 scCreateSymbolFromValue(sc_session session, sc_value handle, sc_status* status);
 
-extern SC_API_EXPORT void 
+extern SC_API_EXPORT void
 scReleaseSymbol(sc_symbol symbol);
 
 extern SC_API_EXPORT const char*

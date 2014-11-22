@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -72,29 +72,29 @@ CloseLogFile(
 		log->stream = NULL;
 		return SC_SUCCESS;
 	}
-	
+
 	return SC_INVALID_LOGGING_INFO;
 }
 
 static sc_status
 OpenLogFile(
-	sc_logging_info_t* log, 
+	sc_logging_info_t* log,
 	const char* filename)
 {
 	static const char *replace = "w";
 	static const char *append = "a+";
 	const char *mode;
-	
+
 	if (log && log->stream)
 		CloseLogFile(log);
-	
+
 	if (filename == NULL)
 		filename = SC_DEFAULT_LOG_FILENAME;
 
 	size_t length = strlen(filename) + 1;
 	log->filename = scAllocate(log->session, length * sizeof(char));
 	snprintf(log->filename, length, "%s", filename);
-	
+
 	mode = (log->flags & SC_LOG_APPEND) ? append : replace;
 	log->stream = fopen(log->filename, mode);
 	if (log->stream == NULL)
@@ -107,16 +107,16 @@ OpenLogFile(
 
 static sc_status
 LogHandler(
-	sc_logging_info_t* log, 
-	sc_int level, 
-	sc_int status, 
-	const char* format, 
+	sc_logging_info_t* log,
+	sc_int level,
+	sc_int status,
+	const char* format,
 	va_list arg_list)
 {
 	static char buffer[4096] = {0};
 	const char *prefix = 0;
 	const char *error = 0;
-		
+
 	switch(level)
 	{
 		case SC_LOG_LEVEL_DEBUG: 	 { prefix = SC_LOG_PREFIX_DEBUG; 		break; }
@@ -127,14 +127,14 @@ LogHandler(
 		case SC_LOG_LEVEL_ERROR: 	 { prefix = SC_LOG_PREFIX_ERROR; 		break; }
 		default:	 				 { prefix = SC_LOG_PREFIX_INFO; 		break; }
 	};
-	
+
     if ((log->stream == NULL) && (log->flags & SC_LOG_FILE))
     {
     	OpenLogFile(log, log->filename);
     }
 
    	(void)vsnprintf(buffer, sizeof(buffer), format, arg_list);
-    if (log->flags & SC_LOG_CONSOLE) 
+    if (log->flags & SC_LOG_CONSOLE)
     {
     	fprintf(stdout, "%s %s", prefix, buffer);
 		if(status != SC_SUCCESS)
@@ -155,21 +155,21 @@ LogHandler(
 		}
         fflush (log->stream);
     }
-    
+
     return SC_SUCCESS;
 }
 
 static sc_status
 SystemLogHandler(
-	sc_int level, 
-	sc_int status, 
-	const char* format, 
+	sc_int level,
+	sc_int status,
+	const char* format,
 	va_list arg_list)
 {
 	static char buffer[4096] = {0};
 	const char *prefix = 0;
 	const char *error = 0;
-		
+
 	switch(level)
 	{
 #if defined(SC_DEBUG_BUILD)
@@ -184,7 +184,7 @@ SystemLogHandler(
 		case SC_LOG_LEVEL_ERROR: 	 { prefix = SC_LOG_PREFIX_ERROR; 		break; }
 		default:	 				 { prefix = SC_LOG_PREFIX_INFO; 		break; }
 	};
-	
+
    	(void)vsnprintf(buffer, sizeof(buffer), format, arg_list);
 	fprintf(stderr, "%s %s", prefix, buffer);
 	if(status != SC_SUCCESS)
@@ -193,7 +193,7 @@ SystemLogHandler(
 		fprintf(stderr, "%s %s", prefix, error);
 	}
 	fflush(stderr);
-    
+
 	if(level == SC_LOG_LEVEL_CRITICAL)
 	{
 #if defined(SC_PLATFORM_WINDOWS)
@@ -217,9 +217,9 @@ scEnableLogging(
 	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
 	if(log == NULL)
 		return SC_INVALID_VALUE;
-	
+
 	log->flags = flags;
-	
+
 	status = OpenLogFile(log, filename);
 	return status;
 }
@@ -233,19 +233,19 @@ scDisableLogging(
 	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
 	if(log == NULL)
 		return SC_INVALID_VALUE;
-	
+
 	CloseLogFile(log);
-	
+
 	if(log->filename)
 	{
 		scDeallocate(session, log->filename);
 		log->filename = NULL;
 	}
-	
+
 	return 0;
 }
 
-sc_status 
+sc_status
 scSetLoggingMode(
 	sc_session session, sc_bitfield flags, const char* filename)
 {
@@ -254,25 +254,25 @@ scSetLoggingMode(
 	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
 	if(log == NULL)
 		return SC_INVALID_VALUE;
-		
+
 	sc_bool append = log->flags & SC_LOG_APPEND;
-	
+
 	log->flags = flags;
-	
+
 	if(log->filename != filename || (log->flags & SC_LOG_APPEND) != append)
 		return OpenLogFile(log, filename);
-	
+
 	return SC_SUCCESS;
 }
 
-sc_status 
+sc_status
 scDebug(
 	sc_session session, const char* format, ...)
 {
 	sc_status status;
 	sc_logging_info handle = scGetLoggingInfo(session, &status);
 	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
-	
+
     va_list arg_list;
     va_start(arg_list, format);
 	if(session == NULL || log == NULL)
@@ -287,7 +287,7 @@ scDebug(
     return status;
 }
 
-sc_status 
+sc_status
 scTest(
 	sc_session session, const char* format, ...)
 {
@@ -309,7 +309,7 @@ scTest(
     return status;
 }
 
-sc_status 
+sc_status
 scInfo(
 	sc_session session, const char* format, ...)
 {
@@ -331,14 +331,14 @@ scInfo(
     return status;
 }
 
-sc_status 
+sc_status
 scWarning(
 	sc_session session, const char* format, ...)
 {
 	sc_status status;
 	sc_logging_info handle = scGetLoggingInfo(session, &status);
 	sc_logging_info_t* log = handle ? (sc_logging_info_t*)handle : 0;
-	
+
     va_list arg_list;
     va_start(arg_list, format);
 	if(session == NULL || log == NULL)
@@ -353,7 +353,7 @@ scWarning(
     return status;
 }
 
-sc_status 
+sc_status
 scCritical(
 	sc_session session, const char* format, ...)
 {
@@ -375,7 +375,7 @@ scCritical(
     return status;
 }
 
-sc_status 
+sc_status
 scError(
 	sc_session session, sc_int error, const char* format, ...)
 {
@@ -397,7 +397,7 @@ scError(
 	return status;
 }
 
-const char * 
+const char *
 scGetErrorString(
 	sc_status status)
 {

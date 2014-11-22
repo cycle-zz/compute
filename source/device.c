@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ scGetDeviceTypeString(
 {
 	if(status)
 		(*status) = SC_SUCCESS;
-	
+
 	switch(type)
 	{
 		case SC_DEVICE_TYPE_DEFAULT:		return "default";
@@ -55,14 +55,14 @@ scGetDeviceTypeString(
 		{
 			if(status)
 				(*status) = SC_INVALID_TYPE;
-		
+
 			return "unknown device type";
 		}
 	};
 
 	if(status)
 		(*status) = SC_INVALID_TYPE;
-	
+
 	return "unknown device type";
 }
 

@@ -2,7 +2,7 @@
 
 Scalable Compute Library - $SC_VERSION_TAG$ <$SC_ID_TAG$>
 
-Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au> 
+Copyright (c) 2010, Derek Gerstmann <derek.gerstmann[|AT|]uwa.edu.au>
 The University of Western Australia. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef __SC_LOGGING_H__
 #define __SC_LOGGING_H__
- 
+
 #include "compute.h"
- 
+
 /**************************************************************************************************/
 
 SC_EXTERN_C_BEGIN
@@ -62,28 +62,28 @@ scEnableLogging(sc_session session, sc_bitfield flags, const char* filename);
 extern SC_API_EXPORT sc_status
 scDisableLogging(sc_session session);
 
-extern SC_API_EXPORT sc_status 
+extern SC_API_EXPORT sc_status
 scSetLoggingMode(sc_session session, sc_bitfield flags,  const char* filename);
 
-extern SC_API_EXPORT sc_status 
+extern SC_API_EXPORT sc_status
 scTest(sc_session session, const char* format, ...);
 
-extern SC_API_EXPORT sc_status 
+extern SC_API_EXPORT sc_status
 scDebug(sc_session session, const char* format, ...);
 
-extern SC_API_EXPORT sc_status 
+extern SC_API_EXPORT sc_status
 scWarning(sc_session session, const char* format, ...);
 
-extern SC_API_EXPORT sc_status 
+extern SC_API_EXPORT sc_status
 scInfo(sc_session session, const char* format, ...);
 
-extern SC_API_EXPORT sc_status 
+extern SC_API_EXPORT sc_status
 scCritical(sc_session session, const char* format, ...);
 
-extern SC_API_EXPORT sc_status 
+extern SC_API_EXPORT sc_status
 scError(sc_session session, cl_int status, const char* format, ...);
 
-extern SC_API_EXPORT const char* 
+extern SC_API_EXPORT const char*
 scGetErrorString(sc_status status);
 
 /**************************************************************************************************/
